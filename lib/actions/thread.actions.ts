@@ -131,9 +131,10 @@ export async function commentThread({
   userId,
   path,
 }: ThreadCommentParams) {
-  connectToDB();
-
+  console.log("User id from actions", userId);
   try {
+    connectToDB();
+
     const threadToComment = await Thread.findById(threadId); // Find the parent thread (the thread the user is trying to comment)
 
     if (!threadToComment) throw new Error("Thread not found");

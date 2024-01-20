@@ -53,7 +53,7 @@ export default function ThreadCommentForm({
 
     await commentThread({
       CommentText: values.threadComment,
-      userId: JSON.parse(userId),
+      userId: userId,
       path: pathname,
       threadId: threadId,
     });
