@@ -21,6 +21,7 @@ import { ThreadFormValidation } from "@/lib/validations/threadsFormValidation";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { createThread } from "@/lib/actions/thread.actions";
+import { useOrganization } from "@clerk/nextjs";
 
 //import { updateThread } from "@/lib/actions/user.actions";
 
@@ -29,6 +30,7 @@ function PostThreadForm({ userId }: { userId: string }) {
 
   const router = useRouter();
   const pathname = usePathname();
+  const { organization } = useOrganization();
 
   const formData = useForm({
     resolver: zodResolver(ThreadFormValidation), // Logic that takes care of the form's submission
@@ -41,11 +43,12 @@ function PostThreadForm({ userId }: { userId: string }) {
   const onSubmit = async (
     values: zodValidator.infer<typeof ThreadFormValidation>
   ) => {
-    //e.preventDefault()
+    const threadCommunityId = !organization ? null : organization?.id;
+
     await createThread({
       threadContent: values.thread,
       threadAuthor: userId,
-      threadCommunity: null,
+      threadCommunity: threadCommunityId,
       path: pathname,
     });
 

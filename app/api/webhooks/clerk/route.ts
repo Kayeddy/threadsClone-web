@@ -78,7 +78,7 @@ export const POST = async (request: Request) => {
         alias: slug,
         // @ts-ignore
         image: logo_url || image_url,
-        description: "org bio",
+        description: "UwU",
         // @ts-ignore
         createdByUserId: created_by,
       });
