@@ -5,7 +5,7 @@ interface Props {
   currentLoggedInUserId: string;
   accessedAccountId: string;
   accessedAccountImage: string;
-  accountThreads: any;
+  accountThreads: any[];
   accountType: string;
 }
 
@@ -18,7 +18,7 @@ export default async function ThreadsTab({
 }: Props) {
   return (
     <section className="mt-9 flex flex-col gap-10">
-      {accountThreads && accountThreads.length ? (
+      {accountThreads.length ? (
         accountThreads.map((thread: any) => {
           const threadCardProps = {
             threadId: thread._id,
@@ -33,12 +33,13 @@ export default async function ThreadsTab({
             threadCommunity: thread.threadCommunity,
             createdAt: thread.createdAt,
             threadComments: thread.children,
+            isInCommunityPage: accountType === "Community" ? true : false,
           };
 
           return <ThreadCard key={thread._id} {...threadCardProps} />;
         })
       ) : (
-        <p>No threads available to show at the moment</p>
+        <p>No threads available.</p>
       )}
     </section>
   );

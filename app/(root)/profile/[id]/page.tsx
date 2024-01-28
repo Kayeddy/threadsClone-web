@@ -1,5 +1,6 @@
-import UserProfileHeader from "@/components/shared/profile/userProfileHeader";
-import AccountProfileTabs from "@/components/tabs/AccountProfileTabs";
+import UserProfileHeader from "@/components/shared/AccountProfileHeader";
+import AccountProfileTabs from "@/components/shared/AccountProfileTabs";
+import { profileTabs } from "@/constants";
 import {
   fetchProfileThreads,
   fetchUserData,
@@ -44,7 +45,9 @@ export default async function UserProfile({
           userId={currentLoggedInUserData.id}
           accountId={accessedUserProfileData.id}
           accountImage={accessedUserProfileData.image}
-          userThreads={fetchedThreads.threads}
+          accountThreads={fetchedThreads.threads}
+          tabList={profileTabs}
+          accountType="User"
         />
       </div>
     </section>

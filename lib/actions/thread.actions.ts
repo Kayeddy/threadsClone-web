@@ -29,14 +29,14 @@ export async function createThread({
   try {
     connectToDB();
     const communityIdObject = await Community.findOne(
-      { id: JSON.stringify(threadCommunity) },
+      { id: threadCommunity },
       { _id: 1 }
     );
 
     const createdThread = await Thread.create({
       threadContent,
       threadAuthor,
-      threadCommunity: threadCommunity,
+      threadCommunity: communityIdObject,
     });
 
     // update User model

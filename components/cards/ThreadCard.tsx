@@ -24,6 +24,7 @@ interface Props {
     };
   }[];
   isComment?: boolean; // Not required
+  isInCommunityPage?: boolean;
 }
 
 export default function ThreadCard({
@@ -36,14 +37,16 @@ export default function ThreadCard({
   createdAt,
   threadComments,
   isComment,
+  isInCommunityPage = false,
 }: Props) {
   const handlePostLike = async () => {
     //TODO: Implement user like post backend logic
   };
+
   return (
     <article
-      className={`flex-container w-full flex-col rounded-xl  ${
-        isComment ? "px-0 xs:px-7" : "bg-dark-2 p-7"
+      className={`flex-container w-full flex-col rounded-xl p-7 ${
+        isComment ? "px-0 xs:px-7" : "bg-dark-2"
       }`}
     >
       <div className="flex items-start justify-between">
@@ -82,7 +85,7 @@ export default function ThreadCard({
                   alt="Thread_Heart_Reaction_Icon"
                   width={24}
                   height={24}
-                  className="cursor-pointer object-contain"
+                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                   //onClick={handlePostLike}
                 ></Image>
 
@@ -92,7 +95,7 @@ export default function ThreadCard({
                     alt="Thread_Reply_Icon"
                     width={24}
                     height={24}
-                    className="cursor-pointer object-contain"
+                    className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                   ></Image>
                 </Link>
 
@@ -101,7 +104,7 @@ export default function ThreadCard({
                   alt="Thread_Repost_Icon"
                   width={24}
                   height={24}
-                  className="cursor-pointer object-contain"
+                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                 ></Image>
 
                 <Image
@@ -109,7 +112,7 @@ export default function ThreadCard({
                   alt="Thread_Share_Icon"
                   width={24}
                   height={24}
-                  className="cursor-pointer object-contain"
+                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                 ></Image>
               </div>
               {isComment && threadComments.length > 0 && (
@@ -125,25 +128,29 @@ export default function ThreadCard({
         {/** TODO: Delete thread functionality */}
         {/** TODO: Show number of replies with recent replicants logos */}
         {/** TODO: show Thread post time */}
-        {!isComment && threadCommunity && (
-          <Link
-            href={`/communities/${threadCommunity.id}`}
-            className="mt-5 flex items-center"
-          >
-            <p className="text-subtle-medium text-gray-1">
-              {formatDateString(createdAt)}- {threadCommunity.name} community
-            </p>
-
-            <Image
-              src={threadCommunity.image}
-              alt={threadCommunity.name}
-              width={14}
-              height={14}
-              className="ml-1 rounded-full object-cover"
-            />
-          </Link>
-        )}
       </div>
+      {!isComment && threadCommunity && !isInCommunityPage ? (
+        <Link
+          href={`/communities/${threadCommunity.id}`}
+          className="mt-5 flex items-center"
+        >
+          <p className="text-subtle-medium text-gray-1">
+            {formatDateString(createdAt)} | {threadCommunity.name} community
+          </p>
+
+          <Image
+            src={threadCommunity.image}
+            alt={threadCommunity.name}
+            width={14}
+            height={14}
+            className="ml-1 rounded-full object-cover"
+          />
+        </Link>
+      ) : (
+        <p className="text-subtle-medium text-gray-1 mt-5">
+          {formatDateString(createdAt)}
+        </p>
+      )}
     </article>
   );
 }

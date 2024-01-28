@@ -34,7 +34,7 @@ export default async function Search() {
           <>
             {fetchedUsers.retrievedUsers.map((user) => {
               const userCardProps = {
-                userId: JSON.stringify(user._id),
+                userId: user._id,
                 name: user.name,
                 username: user.username,
                 userProfileImage: user.image,

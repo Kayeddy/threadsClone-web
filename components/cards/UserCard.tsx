@@ -37,7 +37,7 @@ export default function UserCard({
         </div>
       </div>
       <Button
-        className="user-card_btn"
+        className="user-card_btn hover:scale-110 transition-all duration-300 ease-in-out"
         onClick={() => router.push(`/profile/${userId}`)}
       >
         View
