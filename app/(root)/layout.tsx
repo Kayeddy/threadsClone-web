@@ -23,6 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
+      <SpeedInsights />
       <html lang="en">
         <body className={inter.className}>
           <TopBar />
