@@ -106,10 +106,8 @@ export const POST = async (request: Request) => {
         { status: 201 }
       );
     } catch (err) {
-      console.log(err);
-
       return NextResponse.json(
-        { message: "Internal Server Error" },
+        { message: `Internal Server Error. Error details =>  ${err}` },
         { status: 500 }
       );
     }
@@ -131,10 +129,8 @@ export const POST = async (request: Request) => {
         { status: 201 }
       );
     } catch (err) {
-      console.log(err);
-
       return NextResponse.json(
-        { message: "Internal Server Error" },
+        { message: `Internal Server Error. Error details =>  ${err}` },
         { status: 500 }
       );
     }

@@ -179,35 +179,6 @@ export async function addMemberToCommunity(
 ) {
   try {
     connectToDB();
-
-    // Find the community by its unique id
-    const targetCommunity = await Community.findOne({ id: communityId });
-
-    if (!targetCommunity) {
-      throw new Error("Community not found");
-    }
-
-    // Find the user by their unique id
-    const userToAdd = await User.findOne({ id: memberId });
-
-    if (!userToAdd) {
-      throw new Error("User not found");
-    }
-
-    // Check if the user is already a member of the community
-    if (targetCommunity.members.includes(userToAdd._id)) {
-      throw new Error("User is already a member of the community");
-    }
-
-    // Add the user's _id to the members array in the community
-    targetCommunity.members.push(userToAdd._id);
-    await targetCommunity.save();
-
-    // Add the community's _id to the communities array in the user
-    userToAdd.communities.push(targetCommunity._id);
-    await userToAdd.save();
-
-    return targetCommunity;
   } catch (error) {
     // Handle any errors
     throw new Error(
