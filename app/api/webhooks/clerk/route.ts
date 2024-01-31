@@ -23,6 +23,7 @@ import {
 type EventType =
   | "organization.created"
   | "organizationInvitation.created"
+  | "organizationInvitation.accepted"
   | "organizationMembership.created"
   | "organizationMembership.deleted"
   | "organization.updated"
@@ -103,6 +104,29 @@ export const POST = async (request: Request) => {
 
       return NextResponse.json(
         { message: "Invitation created" },
+        { status: 201 }
+      );
+    } catch (err) {
+      return NextResponse.json(
+        { message: `Internal Server Error. Error details =>  ${err}` },
+        { status: 500 }
+      );
+    }
+  }
+
+  // Listen organization invitation accepted
+  if (eventType === "organizationInvitation.accepted") {
+    try {
+      // Resource: https://clerk.com/docs/reference/backend-api/tag/Organization-Memberships#operation/CreateOrganizationMembership
+      // Show what evnt?.data sends from above resource
+      const { organization, public_user_data } = evnt?.data;
+      console.log("created", evnt?.data);
+
+      // @ts-ignore
+      await addMemberToCommunity(organization.id, public_user_data.user_id);
+
+      return NextResponse.json(
+        { message: "Invitation accepted" },
         { status: 201 }
       );
     } catch (err) {
@@ -199,7 +223,7 @@ export const POST = async (request: Request) => {
       console.log(err);
 
       return NextResponse.json(
-        { message: "Internal Server Error" },
+        { message: `Internal Server Error. Error details =>  ${err}` },
         { status: 500 }
       );
     }
