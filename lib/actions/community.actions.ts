@@ -292,6 +292,7 @@ export async function deleteCommunity(communityId: string) {
       id: communityId,
     });
 
+    /*
     if (!targetCommunity) {
       throw new Error("Community not found");
     }
@@ -309,6 +310,8 @@ export async function deleteCommunity(communityId: string) {
     });
 
     await Promise.all(updateUserPromises);
+
+    */
 
     return targetCommunity;
   } catch (error) {
