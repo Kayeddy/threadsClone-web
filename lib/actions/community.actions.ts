@@ -200,7 +200,7 @@ export async function addMemberToCommunity(
     }
 
     // Add the user's _id to the members array in the community
-    targetCommunity.members.push(targetCommunity._id);
+    targetCommunity.members.push(targetUser._id);
     await targetCommunity.save();
 
     // Add the community's _id to the communities array in the user
