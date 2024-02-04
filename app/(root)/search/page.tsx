@@ -28,10 +28,14 @@ export default async function Search({
   }
 
   // Fetch data from database depending on the URL parameters
-  if (searchParams.author || searchParams.author === "") {
+  if (
+    searchParams.author ||
+    searchParams.author === "" ||
+    !Object.values(searchParams).length
+  ) {
     fetchedUsers = await fetchAllUsers({
       userId: currentLoggedInUserData._id,
-      searchString: searchParams.author,
+      searchString: searchParams.author ? searchParams.author : "",
       pageNumber: searchParams?.page ? +searchParams.page : 1,
       pageSize: 25,
     });
