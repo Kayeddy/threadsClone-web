@@ -42,7 +42,7 @@ export async function fetchAllUsers({
 
     // Create an initial query object to filter users.
     const usersRetrievalFilterQuery: FilterQuery<typeof User> = {
-      userId: { $ne: userId }, // Filter out the currently loggedIn user
+      _id: { $ne: userId }, // Filter out the currently loggedIn user
     };
 
     // If the search string is not empty, add the $or operator to match either username or name fields.

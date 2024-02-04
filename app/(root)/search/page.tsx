@@ -54,7 +54,7 @@ export default async function Search({
     return fetchedUsers.retrievedUsers.map((user: any) => (
       <UserCard
         key={user.id}
-        userId={user._id}
+        userId={JSON.stringify(user._id)}
         name={user.name}
         username={user.username}
         userProfileImage={user.image}
