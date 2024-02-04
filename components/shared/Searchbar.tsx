@@ -33,6 +33,10 @@ export default function Searchbar() {
     return () => clearTimeout(delayDebounceFn);
   }, [search, routeType]);
 
+  useEffect(() => {
+    router.push(`/search?${routeType}`);
+  }, []);
+
   return (
     <div className="search-bar">
       <Image

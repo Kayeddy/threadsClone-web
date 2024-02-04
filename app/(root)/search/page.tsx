@@ -10,7 +10,7 @@ import { redirect } from "next/navigation";
 export default async function Search({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: { [key: string]: string };
 }) {
   const currentLoggedInUser = await currentUser();
   const currentLoggedInUserData = await fetchUserData(
@@ -84,6 +84,8 @@ export default async function Search({
       ));
     }
   };
+
+  console.log("These are the search params gotten back:", searchParams);
 
   return (
     <section>
