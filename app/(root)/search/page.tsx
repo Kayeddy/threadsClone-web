@@ -17,9 +17,12 @@ export default async function Search({
     currentLoggedInUser ? currentLoggedInUser?.id : ""
   );
 
+  const searchingByAuthor = "author" in searchParams;
+  const searchingBycCommunity = "community" in searchParams;
+  const loadingSearch = "loading" in searchParams;
+
   let fetchedUsers: any = null;
   let fetchedCommunities: any = null;
-  console.log(searchParams);
 
   if (!currentLoggedInUser) return null;
 
@@ -28,21 +31,16 @@ export default async function Search({
   }
 
   // Fetch data from database depending on the URL parameters
-  if (
-    searchParams.author ||
-    searchParams.author === "" ||
-    !Object.values(searchParams).length
-  ) {
+  if (searchingByAuthor) {
     fetchedUsers = await fetchAllUsers({
       userId: currentLoggedInUserData._id,
       searchString: searchParams.author ? searchParams.author : "",
       pageNumber: searchParams?.page ? +searchParams.page : 1,
       pageSize: 25,
     });
-    console.log("fetchedUsers: ", fetchedUsers);
   }
 
-  if (searchParams.community || searchParams.community === "") {
+  if (searchingBycCommunity) {
     fetchedCommunities = await fetchCommunities({
       searchString: searchParams.q,
       pageNumber: searchParams?.page ? +searchParams.page : 1,
@@ -92,14 +90,11 @@ export default async function Search({
       <h1 className="head-text mb-10">Search</h1>
       <Searchbar />
       <div className="mt-14 flex flex-col gap-9">
-        {!Object.values(searchParams).length && renderUsers()}
+        {loadingSearch && <Loader />}
 
-        {searchParams.loading && searchParams.loading === "true" && <Loader />}
+        {searchingByAuthor && renderUsers()}
 
-        {(searchParams.author || searchParams.author === "") && renderUsers()}
-
-        {(searchParams.community || searchParams.community === "") &&
-          renderCommunities()}
+        {searchingBycCommunity && renderCommunities()}
       </div>
     </section>
   );
