@@ -88,6 +88,8 @@ export default async function Search({
       <h1 className="head-text mb-10">Search</h1>
       <Searchbar />
       <div className="mt-14 flex flex-col gap-9">
+        {!Object.values(searchParams).length && renderUsers()}
+
         {searchParams.loading && searchParams.loading === "true" && <Loader />}
 
         {(searchParams.author || searchParams.author === "") && renderUsers()}
