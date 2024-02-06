@@ -141,6 +141,57 @@ export async function fetchThreadById(id: string) {
   }
 }
 
+export async function fetchThreadsByCommunity(
+  communityId: string,
+  pageNumber = 1,
+  pageSize = 20
+) {
+  connectToDB();
+
+  // Calculate the number of threads to jump over in order to implement pagination
+  const skipAmount = (pageNumber - 1) * pageSize;
+
+  try {
+    // Get the total number of threads for the specified community, also for pagination purposes
+    const totalThreadsCount = await Thread.countDocuments({
+      parentId: { $in: [null, undefined] },
+      threadCommunity: communityId,
+    });
+
+    // Fetch posts that have no parents (top-level threads) for the specified community
+    const getThreadsQuery = Thread.find({
+      parentId: { $in: [null, undefined] },
+      threadCommunity: communityId,
+    })
+      .sort({ createdAt: "desc" })
+      .skip(skipAmount)
+      .limit(pageSize)
+      .populate({ path: "threadAuthor", model: User })
+      .populate({
+        path: "threadCommunity",
+        model: Community,
+      })
+      .populate({
+        path: "children",
+        populate: {
+          path: "threadAuthor",
+          model: User,
+          select: "_id name parentId image",
+        },
+      });
+
+    const obtainedThreads = await getThreadsQuery.exec();
+
+    const isNext = totalThreadsCount > skipAmount + obtainedThreads.length;
+
+    return { obtainedThreads, isNext };
+  } catch (error) {
+    throw new Error(
+      `Couldn't fetch threads for the specified community. Error details => ${error}`
+    );
+  }
+}
+
 export async function commentThread({
   threadId,
   CommentText,

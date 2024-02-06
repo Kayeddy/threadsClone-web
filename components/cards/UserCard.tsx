@@ -32,8 +32,12 @@ export default function UserCard({
         />
 
         <div className="flex-1 text-ellipsis">
-          <h4 className="text-base-semibold text-light-1">{name}</h4>
-          <p className="text-small-medium text-gray-1">@{username}</p>
+          <h4 className="text-base-semibold text-light-1 truncate max-w-[100px]">
+            {name}
+          </h4>
+          <p className="text-small-medium text-gray-1">
+            {username && `@${username}`}
+          </p>
         </div>
       </div>
       <Button

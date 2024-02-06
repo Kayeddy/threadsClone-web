@@ -1,10 +1,15 @@
 import ThreadCard from "@/components/cards/ThreadCard";
+import ThreadsTab from "@/components/tabs/ThreadsTab";
 import { fetchThreads } from "@/lib/actions/thread.actions";
+import { fetchUserData } from "@/lib/actions/user.actions";
 import { UserButton, currentUser } from "@clerk/nextjs";
 
 export default async function Home() {
-  const threads = (await fetchThreads(1, 30))?.obtainedThreads;
+  const threads = await fetchThreads(1, 30);
   const currentLoggedInUser = await currentUser();
+  const currentLoggedInUserData = await fetchUserData(
+    currentLoggedInUser ? currentLoggedInUser.id : ""
+  );
 
   return (
     <div className="overflow-hidden flex flex-col relative">
@@ -13,28 +18,20 @@ export default async function Home() {
         <h1 className="head-text">Home</h1>
       </section>
       <section className="mt-9 flex flex-col gap-10">
-        {threads.length === 0 ? (
-          <p className="no-result">No threads available at this moment</p>
-        ) : (
-          <div className="h-auto overflow-x-hidden overflow-y-auto relative flex flex-col gap-10 py-10">
-            {threads.map((thread) => {
-              const threadCardProps = {
-                threadId: thread._id,
-                currentUserId: currentLoggedInUser
-                  ? currentLoggedInUser?.id
-                  : null,
-                parentId: thread.parentId ? thread.parentId : null,
-                threadContent: thread.threadContent,
-                threadAuthor: thread.threadAuthor,
-                threadCommunity: thread.threadCommunity,
-                createdAt: thread.createdAt,
-                threadComments: thread.children,
-              };
-
-              return <ThreadCard key={thread._id} {...threadCardProps} />;
-            })}
-          </div>
-        )}
+        <div className="h-auto overflow-x-hidden overflow-y-auto relative flex flex-col gap-10 py-10">
+          <ThreadsTab
+            currentLoggedInUserData={{
+              id: currentLoggedInUserData._id.toString(),
+              name: currentLoggedInUserData.name,
+              username: currentLoggedInUserData.username,
+              image: currentLoggedInUserData.image,
+            }}
+            accessedAccountImage={currentLoggedInUserData.image}
+            accessedAccountId={currentLoggedInUserData._id.toString()}
+            accountThreads={threads.obtainedThreads}
+            accountType="User"
+          />
+        </div>
       </section>
     </div>
   );

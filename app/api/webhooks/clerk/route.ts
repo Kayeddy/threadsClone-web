@@ -10,6 +10,7 @@ import { headers } from "next/headers";
 import { IncomingHttpHeaders } from "http";
 
 import { NextResponse } from "next/server";
+import { useRouter } from "next/router";
 import {
   addMemberToCommunity,
   createCommunity,
@@ -61,6 +62,7 @@ export const POST = async (request: Request) => {
   }
 
   const eventType: EventType = evnt?.type!;
+  const router = useRouter();
 
   // Listen organization creation event
   if (eventType === "organization.created") {
@@ -83,7 +85,7 @@ export const POST = async (request: Request) => {
         // @ts-ignore
         createdByUserId: created_by,
       });
-
+      router.reload();
       return NextResponse.json({ message: "User created" }, { status: 201 });
     } catch (err) {
       console.log(err);
@@ -165,6 +167,7 @@ export const POST = async (request: Request) => {
 
       // @ts-ignore
       await removeUserFromCommunity(public_user_data.user_id, organization.id);
+      router.reload();
 
       return NextResponse.json({ message: "Member removed" }, { status: 201 });
     } catch (err) {
@@ -187,6 +190,7 @@ export const POST = async (request: Request) => {
 
       // @ts-ignore
       await updateCommunityInfo(id, name, slug, logo_url);
+      router.reload();
 
       return NextResponse.json({ message: "Member removed" }, { status: 201 });
     } catch (err) {
@@ -209,6 +213,7 @@ export const POST = async (request: Request) => {
 
       // @ts-ignore
       await deleteCommunity(id);
+      router.reload();
 
       return NextResponse.json(
         { message: "Organization deleted" },

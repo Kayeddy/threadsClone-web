@@ -50,6 +50,7 @@ export default function ThreadCommentForm({
     values: zodValidator.infer<typeof ThreadCommentFormValidation>
   ) => {
     //e.preventDefault()
+    console.log("Thread ID sent from card", threadId);
 
     await commentThread({
       CommentText: values.threadComment,
@@ -95,7 +96,7 @@ export default function ThreadCommentForm({
           />
 
           <Button type="submit" className="comment-form_btn">
-            Reply
+            post
           </Button>
         </form>
       </Form>

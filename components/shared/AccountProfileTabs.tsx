@@ -5,7 +5,7 @@ import ThreadsTab from "../tabs/ThreadsTab";
 import MembersTab from "../tabs/MembersTab";
 
 interface Props {
-  userId: string;
+  userData: any;
   accountThreads: [];
   accountId: string;
   accountImage: string;
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function AccountProfileTabs({
-  userId,
+  userData,
   accountThreads,
   accountId,
   accountImage,
@@ -64,7 +64,12 @@ export default function AccountProfileTabs({
         >
           {tab.value === "threads" && (
             <ThreadsTab
-              currentLoggedInUserId={userId}
+              currentLoggedInUserData={{
+                id: userData._id,
+                name: userData.name,
+                username: userData.username,
+                image: userData.image,
+              }}
               accessedAccountId={accountId}
               accessedAccountImage={accountImage}
               accountThreads={accountThreads}

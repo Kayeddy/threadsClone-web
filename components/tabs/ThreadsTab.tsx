@@ -1,16 +1,20 @@
 import ThreadCard from "@/components/cards/ThreadCard";
-import { fetchProfileThreads } from "@/lib/actions/user.actions";
 
 interface Props {
-  currentLoggedInUserId: string;
+  currentLoggedInUserData: {
+    id: string;
+    name: string;
+    username: string;
+    image: string;
+  };
   accessedAccountId: string;
   accessedAccountImage: string;
   accountThreads: any[];
   accountType: string;
 }
 
-export default async function ThreadsTab({
-  currentLoggedInUserId,
+export default function ThreadsTab({
+  currentLoggedInUserData,
   accessedAccountImage,
   accessedAccountId,
   accountThreads,
@@ -21,16 +25,25 @@ export default async function ThreadsTab({
       {accountThreads.length ? (
         accountThreads.map((thread: any) => {
           const threadCardProps = {
-            threadId: thread._id,
-            currentUserId: currentLoggedInUserId,
-            parentId: thread.parentId ? thread.parentId : null,
+            threadId: thread._id.toString(),
+            currentUserData: {
+              id: currentLoggedInUserData.id,
+              image: currentLoggedInUserData.image,
+            },
+            parentId: thread.parentId ? thread.parentId.toString() : null,
             threadContent: thread.threadContent,
             threadAuthor: {
               name: thread.threadAuthor.name,
               image: accessedAccountImage,
-              id: thread.threadAuthor.userId,
+              id: thread.threadAuthor._id.toString(),
             },
-            threadCommunity: thread.threadCommunity,
+            threadCommunity: thread.community
+              ? {
+                  id: thread.threadCommunity._id.toString(),
+                  name: thread.threadCommunity.name,
+                  image: thread.threadCommunity.image,
+                }
+              : null,
             createdAt: thread.createdAt,
             threadComments: thread.children,
             isInCommunityPage: accountType === "Community" ? true : false,
