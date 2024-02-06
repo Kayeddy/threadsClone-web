@@ -37,7 +37,7 @@ export default async function UserProfile() {
       <UserProfileHeader {...profileHeaderProps} />
       <div className="mt-9">
         <AccountProfileTabs
-          userId={currentLoggedInUserData.id}
+          userId={currentLoggedInUserData._id.toString()}
           accountId={currentLoggedInUserData.id}
           accountImage={currentLoggedInUserData.image}
           accountThreads={fetchedThreads.threads}

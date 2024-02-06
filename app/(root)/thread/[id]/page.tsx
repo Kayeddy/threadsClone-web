@@ -19,7 +19,7 @@ export default async function Thread({ params }: { params: { id: string } }) {
     console.log(JSON.stringify(currentLoggedInUserData._id));
 
   const threadCardProps = {
-    threadId: thread._id,
+    threadId: thread._id.toString(),
     currentUserId: currentLoggedInUser ? currentLoggedInUser?.id : null,
     parentId: thread.parentId ? thread.parentId : null,
     threadContent: thread.threadContent,
@@ -32,9 +32,9 @@ export default async function Thread({ params }: { params: { id: string } }) {
   if (thread) console.log(thread._id);
 
   const threadCommentFormProps = {
-    threadId: thread._id,
+    threadId: thread._id.toString(),
     currentLoggedInUserImage: currentLoggedInUserData.image,
-    userId: currentLoggedInUserData._id,
+    userId: currentLoggedInUserData._id.toString(),
   };
 
   return (
@@ -48,7 +48,7 @@ export default async function Thread({ params }: { params: { id: string } }) {
       <div className="mt-10">
         {thread.children.map((commentThread: any) => {
           const commentThreadCardProps = {
-            threadId: commentThread._id,
+            threadId: commentThread._id.toString(),
             currentUserId: currentLoggedInUser ? currentLoggedInUser?.id : null,
             parentId: commentThread.parentId ? commentThread.parentId : null,
             threadContent: commentThread.threadContent,

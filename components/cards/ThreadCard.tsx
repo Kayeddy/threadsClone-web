@@ -74,7 +74,7 @@ export default function ThreadCard({
               </h4>
             </Link>
 
-            <p className="mt-2 text-small-regular text-light-2">
+            <p className="mt-2 text-small-regular text-light-2 whitespace-pre-line break-all">
               {threadContent}
             </p>
 

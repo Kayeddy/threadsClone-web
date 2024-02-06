@@ -28,8 +28,6 @@ export default async function Page({ params }: { params: { id: string } }) {
   const communityDetails = await fetchCommunityDetails(params.id);
   const communityThreads = await fetchCommunityPosts(communityDetails._id);
 
-  console.log(communityThreads);
-
   const profileHeaderProps = {
     accessedAccountUserId: communityDetails.id,
     currentLoggedInUserId: currentLoggedInUserData.id,

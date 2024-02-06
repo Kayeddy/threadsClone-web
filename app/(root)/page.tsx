@@ -19,7 +19,7 @@ export default async function Home() {
           <div className="h-auto overflow-x-hidden overflow-y-auto relative flex flex-col gap-10 py-10">
             {threads.map((thread) => {
               const threadCardProps = {
-                threadId: thread._id,
+                threadId: thread._id.toString(),
                 currentUserId: currentLoggedInUser
                   ? currentLoggedInUser?.id
                   : null,

@@ -33,7 +33,7 @@ export default async function Search({
   // Fetch data from database depending on the URL parameters
   if (searchingByAuthor) {
     fetchedUsers = await fetchAllUsers({
-      userId: currentLoggedInUserData._id,
+      userId: currentLoggedInUserData._id.toString(),
       searchString: searchParams.author ? searchParams.author : "",
       pageNumber: searchParams?.page ? +searchParams.page : 1,
       pageSize: 25,
@@ -56,7 +56,7 @@ export default async function Search({
     return fetchedUsers.retrievedUsers.map((user: any) => (
       <UserCard
         key={user.id}
-        userId={JSON.stringify(user._id)}
+        userId={user._id.toString()}
         name={user.name}
         username={user.username}
         userProfileImage={user.image}
@@ -74,11 +74,11 @@ export default async function Search({
       return fetchedCommunities.communities.map((community: any) => (
         <CommunityCard
           key={community.id}
-          id={community._id}
+          id={community._id.toString()}
           name={community.name}
           alias={community.alias}
           imgUrl={community.image}
-          createdBy={community.createdBy}
+          createdBy={community.createdBy.toString()}
           members={community.members}
         />
       ));

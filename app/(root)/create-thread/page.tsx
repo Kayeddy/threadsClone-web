@@ -17,7 +17,7 @@ async function Page() {
   return (
     <>
       <h1 className="head-text">Create Thread</h1>
-      <PostThreadForm userId={currentLoggedInUserData?._id} />
+      <PostThreadForm userId={currentLoggedInUserData?._id.toString()} />
     </>
   );
 }
