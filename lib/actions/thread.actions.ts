@@ -88,7 +88,7 @@ export async function fetchThreads(pageNumber = 1, pageSize = 20) {
         populate: {
           path: "threadAuthor",
           model: User,
-          select: "_id name parentId image",
+          select: "_id name image",
         },
       });
 

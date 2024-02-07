@@ -17,22 +17,25 @@ export default async function Home() {
           <p className="no-result">No threads available at this moment</p>
         ) : (
           <div className="h-auto overflow-x-hidden overflow-y-auto relative flex flex-col gap-10 py-10">
-            {threads.map((thread) => {
-              const threadCardProps = {
-                threadId: thread._id.toString(),
-                currentUserId: currentLoggedInUser
-                  ? currentLoggedInUser?.id
-                  : null,
-                parentId: thread.parentId ? thread.parentId : null,
-                threadContent: thread.threadContent,
-                threadAuthor: thread.threadAuthor,
-                threadCommunity: thread.threadCommunity,
-                createdAt: thread.createdAt,
-                threadComments: thread.children,
-              };
-
-              return <ThreadCard key={thread._id} {...threadCardProps} />;
-            })}
+            {threads.map((thread) => (
+              <ThreadCard
+                key={thread._id.toString()}
+                threadId={thread._id.toString()}
+                currentUserId={
+                  currentLoggedInUser ? currentLoggedInUser?.id : null
+                }
+                parentId={thread.parentId ? thread.parentId : null}
+                threadContent={thread.threadContent}
+                threadAuthor={{
+                  name: thread.threadAuthor.name,
+                  image: thread.threadAuthor.image,
+                  id: thread.threadAuthor._id.toString(),
+                }}
+                threadCommunity={thread.threadCommunity}
+                createdAt={thread.createdAt}
+                threadComments={thread.children}
+              />
+            ))}
           </div>
         )}
       </section>

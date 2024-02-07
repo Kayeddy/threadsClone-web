@@ -1,6 +1,8 @@
 import { formatDateString } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import ShareThreadDialog from "../dialogs/ShareThreadDialog";
+import CommentThreadDialog from "../dialogs/CommentThreadDialog";
 
 interface Props {
   threadId: string;
@@ -19,7 +21,10 @@ interface Props {
   } | null;
   createdAt: string;
   threadComments: {
+    threadContent: string;
     threadAuthor: {
+      _id: string;
+      name: string;
       image: string;
     };
   }[];
@@ -89,7 +94,11 @@ export default function ThreadCard({
                   //onClick={handlePostLike}
                 ></Image>
 
-                <Link href={`/thread/${threadId}`}>
+                {/*
+
+             
+
+                 <Link href={`/thread/${threadId}`}>
                   <Image
                     src="/assets/reply.svg"
                     alt="Thread_Reply_Icon"
@@ -98,6 +107,28 @@ export default function ThreadCard({
                     className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                   ></Image>
                 </Link>
+                 
+                */}
+                <CommentThreadDialog
+                  triggerImage={
+                    <Image
+                      src="/assets/reply.svg"
+                      alt="Thread_Reply_Icon"
+                      width={24}
+                      height={24}
+                      className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                    ></Image>
+                  }
+                  authorData={{
+                    name: threadAuthor.name,
+                    image: threadAuthor.image,
+                  }}
+                  threadData={{
+                    id: threadId,
+                    content: threadContent,
+                    //comments: threadComments,
+                  }}
+                />
 
                 <Image
                   src="/assets/repost.svg"
@@ -107,13 +138,18 @@ export default function ThreadCard({
                   className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                 ></Image>
 
-                <Image
-                  src="/assets/share.svg"
-                  alt="Thread_Share_Icon"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-                ></Image>
+                <ShareThreadDialog
+                  triggerImage={
+                    <Image
+                      src="/assets/share.svg"
+                      alt="Thread_Share_Icon"
+                      width={24}
+                      height={24}
+                      className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                    ></Image>
+                  }
+                  threadLink={`/thread/${threadId}`}
+                />
               </div>
               {isComment && threadComments.length > 0 && (
                 <Link href={`/thread/${threadId}`}>
@@ -151,6 +187,10 @@ export default function ThreadCard({
           {formatDateString(createdAt)}
         </p>
       )}
+
+      {threadComments.map((comment) => (
+        <p>{comment.threadContent}</p>
+      ))}
     </article>
   );
 }
