@@ -37,6 +37,7 @@ export default async function Home() {
                 threadCommunity={thread.threadCommunity}
                 createdAt={thread.createdAt}
                 threadComments={thread.children}
+                renderCardInteractions={true}
               />
             ))}
           </div>
