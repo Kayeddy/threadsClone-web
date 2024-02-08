@@ -2,10 +2,13 @@ import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchThreads } from "@/lib/actions/thread.actions";
 import { fetchUserData } from "@/lib/actions/user.actions";
 import { UserButton, currentUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const threads = (await fetchThreads(1, 30))?.obtainedThreads;
   const currentLoggedInUser = await currentUser();
+  if (!currentLoggedInUser) redirect("/sign-in");
+
+  const threads = (await fetchThreads(1, 30))?.obtainedThreads;
   const currentLoggedInUserData = await fetchUserData(
     currentLoggedInUser ? currentLoggedInUser.id : ""
   );
