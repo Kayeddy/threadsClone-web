@@ -46,6 +46,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     tabList: communityTabs,
     accountType: "Community",
     accountMembers: communityDetails.members,
+    renderCardInteractions: false,
   };
 
   return (
