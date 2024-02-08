@@ -58,6 +58,7 @@ export default async function Thread({ params }: { params: { id: string } }) {
             threadCommunity: commentThread.threadCommunity,
             createdAt: commentThread.createdAt,
             threadComments: commentThread.children,
+            renderCardInteractions: false,
           };
 
           return (
