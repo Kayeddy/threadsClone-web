@@ -28,6 +28,7 @@ export default async function Thread({ params }: { params: { id: string } }) {
     threadCommunity: thread.threadCommunity,
     createdAt: thread.createdAt,
     threadComments: thread.children,
+    renderCardInteractions: false,
   };
 
   if (thread) console.log(thread._id);
