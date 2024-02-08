@@ -1,10 +1,14 @@
 import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchThreads } from "@/lib/actions/thread.actions";
+import { fetchUserData } from "@/lib/actions/user.actions";
 import { UserButton, currentUser } from "@clerk/nextjs";
 
 export default async function Home() {
   const threads = (await fetchThreads(1, 30))?.obtainedThreads;
   const currentLoggedInUser = await currentUser();
+  const currentLoggedInUserData = await fetchUserData(
+    currentLoggedInUser ? currentLoggedInUser.id : ""
+  );
 
   return (
     <div className="overflow-hidden flex flex-col relative">
@@ -21,9 +25,8 @@ export default async function Home() {
               <ThreadCard
                 key={thread._id.toString()}
                 threadId={thread._id.toString()}
-                currentUserId={
-                  currentLoggedInUser ? currentLoggedInUser?.id : null
-                }
+                currentUserId={currentLoggedInUserData._id.toString()}
+                currentUserImage={currentLoggedInUserData.image}
                 parentId={thread.parentId ? thread.parentId : null}
                 threadContent={thread.threadContent}
                 threadAuthor={{

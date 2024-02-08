@@ -21,6 +21,7 @@ export default async function Thread({ params }: { params: { id: string } }) {
   const threadCardProps = {
     threadId: thread._id.toString(),
     currentUserId: currentLoggedInUser ? currentLoggedInUser?.id : null,
+    currentUserImage: currentLoggedInUserData.image,
     parentId: thread.parentId ? thread.parentId : null,
     threadContent: thread.threadContent,
     threadAuthor: thread.threadAuthor,
@@ -50,6 +51,7 @@ export default async function Thread({ params }: { params: { id: string } }) {
           const commentThreadCardProps = {
             threadId: commentThread._id.toString(),
             currentUserId: currentLoggedInUser ? currentLoggedInUser?.id : null,
+            currentUserImage: currentLoggedInUserData.image,
             parentId: commentThread.parentId ? commentThread.parentId : null,
             threadContent: commentThread.threadContent,
             threadAuthor: commentThread.threadAuthor,

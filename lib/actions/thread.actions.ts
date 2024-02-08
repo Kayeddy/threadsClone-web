@@ -71,7 +71,7 @@ export async function fetchThreads(pageNumber = 1, pageSize = 20) {
       parentId: { $in: [null, undefined] },
     });
 
-    // Fetch posts that have no parents (top-level threads)
+    // Fetch top-level threads with pagination
     const getThreadsQuery = Thread.find({
       parentId: { $in: [null, undefined] },
     })
@@ -85,11 +85,23 @@ export async function fetchThreads(pageNumber = 1, pageSize = 20) {
       })
       .populate({
         path: "children",
-        populate: {
-          path: "threadAuthor",
-          model: User,
-          select: "_id name image",
-        },
+        populate: [
+          {
+            path: "threadAuthor",
+            model: User,
+            select: "_id name image",
+          },
+          {
+            path: "children",
+            model: "Thread",
+            select: "threadContent",
+            populate: {
+              path: "threadAuthor",
+              model: User,
+              select: "_id name image",
+            },
+          },
+        ],
       });
 
     const obtainedThreads = await getThreadsQuery.exec();

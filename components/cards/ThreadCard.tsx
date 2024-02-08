@@ -7,6 +7,7 @@ import CommentThreadDialog from "../dialogs/CommentThreadDialog";
 interface Props {
   threadId: string;
   currentUserId: string | null;
+  currentUserImage?: string | undefined;
   parentId: string | null;
   threadContent: string;
   threadAuthor: {
@@ -21,7 +22,9 @@ interface Props {
   } | null;
   createdAt: string;
   threadComments: {
+    _id: string;
     threadContent: string;
+    children: any;
     threadAuthor: {
       _id: string;
       name: string;
@@ -30,11 +33,13 @@ interface Props {
   }[];
   isComment?: boolean; // Not required
   isInCommunityPage?: boolean;
+  renderCardInteractions: boolean;
 }
 
 export default function ThreadCard({
   threadId,
   currentUserId,
+  currentUserImage,
   parentId,
   threadContent,
   threadAuthor,
@@ -43,10 +48,36 @@ export default function ThreadCard({
   threadComments,
   isComment,
   isInCommunityPage = false,
+  renderCardInteractions = true,
 }: Props) {
   const handlePostLike = async () => {
     //TODO: Implement user like post backend logic
   };
+
+  let commentsData;
+
+  if (renderCardInteractions) {
+    commentsData = threadComments.map((comment) => ({
+      threadId: comment._id.toString(),
+      threadContent: comment.threadContent,
+      children: comment.children.map((commentChild: any) => {
+        return {
+          id: commentChild._id.toString(),
+          content: commentChild.threadContent,
+          author: {
+            authorId: commentChild.threadAuthor._id.toString(),
+            authorName: commentChild.threadAuthor.name,
+            authorImage: commentChild.threadAuthor.image,
+          },
+        };
+      }),
+      threadAuthor: {
+        id: comment.threadAuthor._id.toString(),
+        name: comment.threadAuthor.name,
+        image: comment.threadAuthor.image,
+      },
+    }));
+  }
 
   return (
     <article
@@ -58,7 +89,9 @@ export default function ThreadCard({
         <div className="flex w-full flex-1 flex-row gap-4">
           <div className="flex flex-col items-center">
             <Link
-              href={`/profile/${threadAuthor.id}`}
+              href={`/profile/${
+                currentUserId === threadAuthor.id ? "" : threadAuthor.id
+              }`}
               className="relative h-11 w-11"
             >
               <Image
@@ -75,7 +108,9 @@ export default function ThreadCard({
           <div className="flex w-full flex-col items-start justify-center">
             <Link href={`/profile/${threadAuthor.id}`} className="w-fit">
               <h4 className="cursor-pointer text-base-semibold text-light-1">
-                {threadAuthor.name}
+                {`${
+                  currentUserId === threadAuthor.id ? "You" : threadAuthor.name
+                }`}
               </h4>
             </Link>
 
@@ -83,82 +118,72 @@ export default function ThreadCard({
               {threadContent}
             </p>
 
-            <div className={`mt-5 flex flex-col gap-3 ${isComment && "mb-8"}`}>
-              <div className="flex gap-3.5">
-                <Image
-                  src="/assets/heart-gray.svg"
-                  alt="Thread_Heart_Reaction_Icon"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-                  //onClick={handlePostLike}
-                ></Image>
-
-                {/*
-
-             
-
-                 <Link href={`/thread/${threadId}`}>
+            {renderCardInteractions && (
+              <div
+                className={`mt-5 flex flex-col gap-3 ${isComment && "mb-8"}`}
+              >
+                <div className="flex gap-3.5">
                   <Image
-                    src="/assets/reply.svg"
-                    alt="Thread_Reply_Icon"
+                    src="/assets/heart-gray.svg"
+                    alt="Thread_Heart_Reaction_Icon"
+                    width={24}
+                    height={24}
+                    className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                    //onClick={handlePostLike}
+                  ></Image>
+
+                  <CommentThreadDialog
+                    triggerImage={
+                      <Image
+                        src="/assets/reply.svg"
+                        alt="Thread_Reply_Icon"
+                        width={24}
+                        height={24}
+                        className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                      ></Image>
+                    }
+                    parentThread={{
+                      id: threadId,
+                      userId: threadAuthor.id,
+                      authorName: threadAuthor.name,
+                      authorImage: threadAuthor.image,
+                      content: threadContent,
+                    }}
+                    comments={commentsData ? commentsData : []}
+                    currentUserId={currentUserId}
+                    currentUserImage={currentUserImage}
+                  />
+
+                  <Image
+                    src="/assets/repost.svg"
+                    alt="Thread_Repost_Icon"
                     width={24}
                     height={24}
                     className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                   ></Image>
-                </Link>
-                 
-                */}
-                <CommentThreadDialog
-                  triggerImage={
-                    <Image
-                      src="/assets/reply.svg"
-                      alt="Thread_Reply_Icon"
-                      width={24}
-                      height={24}
-                      className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-                    ></Image>
-                  }
-                  authorData={{
-                    name: threadAuthor.name,
-                    image: threadAuthor.image,
-                  }}
-                  threadData={{
-                    id: threadId,
-                    content: threadContent,
-                    //comments: threadComments,
-                  }}
-                />
 
-                <Image
-                  src="/assets/repost.svg"
-                  alt="Thread_Repost_Icon"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-                ></Image>
-
-                <ShareThreadDialog
-                  triggerImage={
-                    <Image
-                      src="/assets/share.svg"
-                      alt="Thread_Share_Icon"
-                      width={24}
-                      height={24}
-                      className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-                    ></Image>
-                  }
-                  threadLink={`/thread/${threadId}`}
-                />
+                  <ShareThreadDialog
+                    triggerImage={
+                      <Image
+                        src="/assets/share.svg"
+                        alt="Thread_Share_Icon"
+                        width={24}
+                        height={24}
+                        className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                      ></Image>
+                    }
+                    threadLink={`/thread/${threadId}`}
+                  />
+                </div>
+                {isComment && threadComments.length > 0 && (
+                  <Link href={`/thread/${threadId}`}>
+                    <p className="mt-1 text-subtle-medium text-gray-1">
+                      {threadComments.length} replies
+                    </p>
+                  </Link>
+                )}
               </div>
-              {isComment && threadComments.length > 0 && (
-                <Link href={`/thread/${threadId}`}>
-                  <p className="mt-1 text-subtle-medium text-gray-1">
-                    {threadComments.length} replies
-                  </p>
-                </Link>
-              )}
-            </div>
+            )}
           </div>
         </div>
         {/** TODO: Delete thread functionality */}
@@ -187,10 +212,6 @@ export default function ThreadCard({
           {formatDateString(createdAt)}
         </p>
       )}
-
-      {threadComments.map((comment) => (
-        <p>{comment.threadContent}</p>
-      ))}
     </article>
   );
 }

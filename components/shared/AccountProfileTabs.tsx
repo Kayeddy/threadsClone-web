@@ -12,6 +12,7 @@ interface Props {
   tabList: any[];
   accountType: string;
   accountMembers?: any[] | null;
+  renderCardInteractions: boolean;
 }
 
 export default function AccountProfileTabs({
@@ -22,7 +23,9 @@ export default function AccountProfileTabs({
   tabList,
   accountType,
   accountMembers,
+  renderCardInteractions,
 }: Props) {
+  console.log(accountThreads);
   return (
     <Tabs defaultValue={tabList[0]?.value} className="w-full">
       <TabsList className="tab-list">
@@ -69,6 +72,7 @@ export default function AccountProfileTabs({
               accessedAccountImage={accountImage}
               accountThreads={accountThreads}
               accountType={accountType}
+              renderCardInteractions={renderCardInteractions}
             />
           )}
           {tab.value === "replies" && null}

@@ -25,14 +25,12 @@ import Image from "next/image";
 import { commentThread } from "@/lib/actions/thread.actions";
 
 interface Props {
-  threadId: string;
-  currentLoggedInUserImage: string | undefined;
+  parentThreadId: string;
   userId: string;
 }
 
-export default function ThreadCommentForm({
-  threadId,
-  currentLoggedInUserImage,
+export default function ThreadCommentChildForm({
+  parentThreadId,
   userId,
 }: Props) {
   const router = useRouter();
@@ -55,7 +53,7 @@ export default function ThreadCommentForm({
       CommentText: values.threadComment,
       userId: userId,
       path: pathname,
-      threadId: threadId,
+      threadId: parentThreadId,
     });
 
     formData.reset();
@@ -66,24 +64,13 @@ export default function ThreadCommentForm({
       <Form {...formData}>
         <form
           onSubmit={formData.handleSubmit(onSubmit)}
-          className="comment-form"
+          className="flex gap-2 md:flex-row flex-col"
         >
           <FormField
             control={formData.control}
             name="threadComment"
             render={({ field }) => (
               <FormItem className="flex items-center gap-3 w-full">
-                <FormLabel>
-                  <Image
-                    src={
-                      currentLoggedInUserImage ? currentLoggedInUserImage : ""
-                    }
-                    alt="commenting-user-profile-image"
-                    width={48}
-                    height={48}
-                    className="rounded-full object-cover"
-                  />
-                </FormLabel>
                 <FormControl className="border-none bg-transparent">
                   <Input
                     type="text"
@@ -96,7 +83,7 @@ export default function ThreadCommentForm({
             )}
           />
 
-          <Button type="submit" className="comment-form_btn">
+          <Button type="submit" className="comment-child-form_btn">
             Reply
           </Button>
         </form>

@@ -7,6 +7,7 @@ interface Props {
   accessedAccountImage: string;
   accountThreads: any[];
   accountType: string;
+  renderCardInteractions: boolean;
 }
 
 export default async function ThreadsTab({
@@ -15,6 +16,7 @@ export default async function ThreadsTab({
   accessedAccountId,
   accountThreads,
   accountType,
+  renderCardInteractions,
 }: Props) {
   return (
     <section className="mt-9 flex flex-col gap-10">
@@ -28,12 +30,13 @@ export default async function ThreadsTab({
             threadAuthor: {
               name: thread.threadAuthor.name,
               image: accessedAccountImage,
-              id: thread.threadAuthor.userId,
+              id: thread.threadAuthor._id.toString(),
             },
             threadCommunity: thread.threadCommunity,
             createdAt: thread.createdAt,
             threadComments: thread.children,
             isInCommunityPage: accountType === "Community" ? true : false,
+            renderCardInteractions: renderCardInteractions,
           };
 
           return <ThreadCard key={thread._id} {...threadCardProps} />;

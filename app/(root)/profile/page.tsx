@@ -43,6 +43,7 @@ export default async function UserProfile() {
           accountThreads={fetchedThreads.threads}
           tabList={profileTabs}
           accountType="User"
+          renderCardInteractions={false}
         />
       </div>
     </section>

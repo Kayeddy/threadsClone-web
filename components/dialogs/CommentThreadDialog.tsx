@@ -1,4 +1,3 @@
-"use client";
 import { CopyIcon } from "@radix-ui/react-icons";
 
 import { Button } from "@/components/ui/button";
@@ -14,56 +13,90 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  fetchAllComments,
+  fetchThreadById,
+} from "@/lib/actions/thread.actions";
+import DynamicCommentsTab from "../tabs/DynamicCommentsTab";
+import Image from "next/image";
+import ThreadCommentForm from "../forms/ThreadCommentForm";
+import Link from "next/link";
 
 interface Props {
   triggerImage: React.ReactNode;
-  authorData: {
-    name: string;
-    image: string;
-  };
-  threadData: {
+  parentThread: {
     id: string;
+    userId: string;
+    authorName: string;
+    authorImage: string;
     content: string;
-    comments?: any[];
   };
+  comments: {}[];
+  currentUserId: string | null;
+  currentUserImage: string | undefined;
 }
 
-export default function CommentThreadDialog({
+export default async function CommentThreadDialog({
   triggerImage,
-  authorData,
-  threadData,
+  parentThread,
+  comments,
+  currentUserId,
+  currentUserImage,
 }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-dark-2 text-white sm:max-h-52">
-        <DialogHeader>
-          <DialogTitle className="text-light-1">Share Thread</DialogTitle>
-          <DialogDescription className="text-light-2"></DialogDescription>
+      <DialogContent className="max-w-[90vw] h-[550px] sm:max-w-xl bg-dark-2 text-white overflow-hidden flex flex-col">
+        <DialogHeader className="flex flex-col">
+          <DialogTitle className="text-light-1">
+            <div className="flex flex-col items-start">
+              <Link
+                href={`${
+                  currentUserId === parentThread.userId
+                    ? "/profile"
+                    : `/${parentThread.userId}`
+                }`}
+                className="relative h-10 w-11 hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200 flex flex-row items-center justify-start gap-4"
+              >
+                <Image
+                  src={parentThread.authorImage}
+                  alt="Thread_author_image"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer object-contain "
+                ></Image>
+
+                <p className="text-base-semibold text-light-1">
+                  {currentUserId === parentThread.userId
+                    ? "You"
+                    : parentThread.authorName}
+                </p>
+              </Link>
+
+              <p className="mt-2 text-base-regular text-light-2 whitespace-pre-line break-all">
+                {parentThread.content}
+              </p>
+            </div>
+          </DialogTitle>
+          <DialogDescription className="text-light-2 custom-scrollbar overflow-y-scroll h-[350px] py-4 transition-all duration-200 ease-in-out">
+            {comments.length > 0 ? (
+              <DynamicCommentsTab
+                commentsList={comments}
+                currentUserId={currentUserId ? currentUserId : ""}
+                parentThreadId={parentThread.id}
+              />
+            ) : (
+              <p className="no-result">No comments available</p>
+            )}
+          </DialogDescription>
         </DialogHeader>
-        <div className="flex items-center space-x-2">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="link" className="sr-only">
-              Link
-            </Label>
-            <Input
-              className="text-black"
-              id="link"
-              defaultValue={""}
-              readOnly
-            />
-          </div>
-          <Button type="submit" size="sm" className="px-3" onClick={() => {}}>
-            <span className="sr-only">Copy</span>
-            <CopyIcon className="h-4 w-4" />
-          </Button>
-        </div>
+
         <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Close
-            </Button>
-          </DialogClose>
+          <ThreadCommentForm
+            threadId={parentThread.id}
+            currentLoggedInUserImage={currentUserImage}
+            userId={currentUserId ? currentUserId : ""}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>
