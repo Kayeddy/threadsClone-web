@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 
 export default function ShareThreadDialog({
   triggerImage,
@@ -23,8 +23,8 @@ export default function ShareThreadDialog({
   triggerImage: React.ReactNode;
   threadId: string;
 }) {
-  const pathname = usePathname();
-  const threadLink = `${pathname}${threadId}`;
+  const pathname = window.location.href;
+  const threadLink = `${pathname}thread/${threadId}`;
   return (
     <Dialog>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
