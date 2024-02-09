@@ -66,11 +66,11 @@ export default async function CommentThreadDialog({
                   className="cursor-pointer object-contain "
                 ></Image>
 
-                <p className="text-base-semibold text-light-1">
+                <span className="text-base-semibold text-light-1">
                   {currentUserId === parentThread.userId
                     ? "You"
                     : parentThread.authorName}
-                </p>
+                </span>
               </Link>
 
               <p className="mt-2 text-base-regular text-light-2 whitespace-pre-line break-all">

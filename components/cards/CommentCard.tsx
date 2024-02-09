@@ -88,7 +88,7 @@ export default function CommentCard({
             </div>
             {isCommenting && (
               <div className="flex flex-col h-[200px]">
-                <div className="h-[100px] overflow-hidden custom-scrollbar overflow-y-scroll">
+                <div className="h-[150px] overflow-hidden custom-scrollbar overflow-y-scroll">
                   {commentChildren.length > 0 ? (
                     commentChildren?.map((child: any) => (
                       <CommentChildCard

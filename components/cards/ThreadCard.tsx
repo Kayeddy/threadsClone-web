@@ -172,7 +172,7 @@ export default function ThreadCard({
                         className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                       ></Image>
                     }
-                    threadLink={`/thread/${threadId}`}
+                    threadId={threadId}
                   />
                 </div>
                 {isComment && threadComments.length > 0 && (
