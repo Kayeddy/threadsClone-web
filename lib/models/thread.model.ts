@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+/**
+ * Represents a thread or post in the application. Threads can be standalone or
+ * part of a community, and can also be comments on other threads, forming a nested structure.
+ */
 const threadSchema = new mongoose.Schema({
   threadContent: { type: String, required: true },
   threadAuthor: {
@@ -9,14 +13,17 @@ const threadSchema = new mongoose.Schema({
   },
   threadCommunity: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
   createdAt: { type: Date, default: Date.now },
-  parentId: { type: String }, //In case this thread is a comment
+  parentId: { type: String }, // Indicates if this thread is a comment on another thread
   children: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Thread", // This self reference indicates that a children of a thread can have multiple other threads as children (nested comments)
+      ref: "Thread",
     },
   ],
 });
+
+// Index for efficient querying and sorting by creation date
+threadSchema.index({ createdAt: -1 }); // Index on 'createdAt' for quick retrieval of recent threads
 
 const Thread = mongoose.models.Thread || mongoose.model("Thread", threadSchema);
 

@@ -40,7 +40,7 @@ export default async function UserProfile() {
           userId={currentLoggedInUserData._id.toString()}
           accountId={currentLoggedInUserData.id}
           accountImage={currentLoggedInUserData.image}
-          accountThreads={fetchedThreads.threads}
+          accountThreads={fetchedThreads}
           tabList={profileTabs}
           accountType="User"
           renderCardInteractions={false}

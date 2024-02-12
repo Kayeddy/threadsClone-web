@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+/**
+ * Represents a user of the application. Users can create threads, join communities,
+ * and have a list of threads they've participated in.
+ */
 const userSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   name: { type: String, required: true, unique: true },
@@ -24,13 +28,11 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-{
-  /*
-    Whenever the application just starts the mongoose models is not going to exist in the database, therefore, 
-    the schema will be created from the second condition after the OR conditional. However, after the schema 
-    has been created and recognized, it will then fall back to using the models we provided internally.
-*/
-}
+// Indexes for efficient querying and data management
+userSchema.index({ userId: 1 }); // Index on 'userId' for quick user identification
+userSchema.index({ image: 1 }); // Index on 'userId' for quick user image retrieval
+userSchema.index({ username: 1 }, { unique: true }); // Unique index on 'username'
+
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;

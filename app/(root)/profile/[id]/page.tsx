@@ -45,7 +45,7 @@ export default async function UserProfile({
           userId={currentLoggedInUserData.id}
           accountId={accessedUserProfileData.id}
           accountImage={accessedUserProfileData.image}
-          accountThreads={fetchedThreads.threads}
+          accountThreads={fetchedThreads}
           tabList={profileTabs}
           accountType="User"
           renderCardInteractions={false}

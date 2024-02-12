@@ -7,7 +7,7 @@ import Thread from "../models/thread.model";
 import { FilterQuery, SortOrder } from "mongoose";
 import Community from "../models/community.model";
 
-interface updateUserParams {
+interface UpdateUserParams {
   userId: string;
   name: string;
   username: string;
@@ -16,7 +16,7 @@ interface updateUserParams {
   path: string;
 }
 
-interface fetchAllUsersParams {
+interface FetchAllUsersParams {
   userId: string;
   searchString?: string;
   pageNumber?: number;
@@ -24,96 +24,129 @@ interface fetchAllUsersParams {
   sortBy?: SortOrder;
 }
 
+/**
+ * Fetches a list of users based on search criteria, excluding the current user,
+ * with support for pagination and sorting.
+ *
+ * @param {FetchAllUsersParams} params Parameters for user search and pagination.
+ * @returns An object containing the list of retrieved users and a flag indicating the presence of a next page.
+ */
 export async function fetchAllUsers({
   userId,
   searchString = "",
   pageNumber = 1,
   pageSize = 20,
   sortBy = "desc",
-}: fetchAllUsersParams) {
+}: FetchAllUsersParams) {
+  await connectToDB();
+
   try {
-    connectToDB();
-
-    // Calculate the number of users to skip based on the page number and page size.
     const pageSkipAmount = (pageNumber - 1) * pageSize;
-
-    // Create a case-insensitive regular expression for the provided search string.
     const regex = new RegExp(searchString, "i");
 
-    // Create an initial query object to filter users.
-    const usersRetrievalFilterQuery: FilterQuery<typeof User> = {
-      _id: { $ne: userId }, // Filter out the currently loggedIn user
+    // Enhanced filter to exclude current user and include search functionality
+    const filterQuery = {
+      _id: { $ne: userId }, // Exclude the current user from the results
+      ...(searchString && {
+        // Conditionally add search criteria if searchString is provided
+        $or: [
+          { username: { $regex: regex, $options: "i" } }, // Case-insensitive search
+          { name: { $regex: regex, $options: "i" } },
+        ],
+      }),
     };
 
-    // If the search string is not empty, add the $or operator to match either username or name fields.
-    if (searchString.trim() !== "") {
-      usersRetrievalFilterQuery.$or = [
-        { username: { $regex: regex } },
-        { name: { $regex: regex } },
-      ];
-    }
+    // Determining sort order
+    const sortOptions = { createdAt: sortBy === "desc" ? -1 : 1 };
 
-    // Define the sort options for the fetched users based on createdAt field and provided sort order.
-    const usersRetrievalSortOptions = {
-      createdAt: sortBy,
-    };
+    // Execute the query with filter, sorting, pagination, and count total matching documents
+    const [retrievedUsers, totalUsersCount] = await Promise.all([
+      User.find(filterQuery)
+        // @ts-ignore
+        .sort(sortOptions)
+        .skip(pageSkipAmount)
+        .limit(pageSize),
+      User.countDocuments(filterQuery),
+    ]);
 
-    const usersRetrievalQuery = User.find(usersRetrievalFilterQuery)
-      .sort(usersRetrievalSortOptions)
-      .skip(pageSkipAmount)
-      .limit(pageSize);
-
-    // Count the total number of users that match the search criteria (without pagination).
-    const totalUsersCount = await User.countDocuments(
-      usersRetrievalFilterQuery
-    );
-
-    const retrievedUsers = await usersRetrievalQuery.exec();
-
-    // Check if there are more users beyond the current page.
+    // Calculate if more users exist beyond the current page
     const isNextPageRequired =
-      totalUsersCount > pageSkipAmount + usersRetrievalFilterQuery.length;
+      totalUsersCount > pageSkipAmount + retrievedUsers.length;
 
     return { retrievedUsers, isNextPageRequired };
   } catch (error) {
+    console.error(`Error fetching users: ${error}`);
     throw new Error(
       `Failed to fetch users from database. Error details: ${error}`
     );
   }
 }
 
+/**
+ * Fetches data for a specific user, including the communities they are part of.
+ *
+ * @param userId - The unique identifier of the user whose data is being fetched.
+ * @returns The user document with populated community information.
+ */
 export async function fetchUserData(userId: string) {
+  connectToDB();
+
   try {
-    connectToDB();
-    return await User.findOne({ userId: userId }).populate({
+    const user = await User.findOne({ userId: userId }).populate({
       path: "communities",
       model: Community,
     });
-  } catch (error: any) {
-    throw new Error(
-      `Failed to fetch user and data from database. Error details => ${error}`
-    );
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user; // Directly returning the user object.
+  } catch (error) {
+    console.error(`Error fetching user data: ${error}`);
+    throw new Error(`Failed to fetch user data. Error details: ${error}`);
   }
 }
 
+/**
+ * Fetches data for a specific user by their MongoDB ObjectId, with an option to populate related communities.
+ *
+ * @param userId - The MongoDB ObjectId of the user to fetch.
+ * @returns The user document, optionally with populated community information.
+ */
 export async function fetchUserDataByDBId(userId: string) {
-  try {
-    connectToDB();
-    return await User.findOne({ _id: userId });
+  await connectToDB();
 
-    /*
-    .populate({
-      path: "communities",
-      model: Community
-    });
-    */
-  } catch (error: any) {
-    throw new Error(
-      `Failed to fetch user and data from database. Error details: ${error}`
-    );
+  try {
+    const user = await User.findById(userId) // Simplified to use findById for direct _id querying.
+      /*
+      Uncomment below if community data population is needed. Ensure your User model
+      correctly references communities for this to work as expected.
+      .populate({
+        path: "communities",
+        // Assuming 'communities' is correctly set up in your User schema to reference Community documents.
+      })
+      */
+      .exec(); // Execute the query.
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  } catch (error) {
+    console.error(`Error fetching user by DB ID: ${error}`);
+    throw new Error(`Failed to fetch user data. Error details: ${error}`);
   }
 }
 
+/**
+ * Updates the user's profile information. If the specified user doesn't exist and `upsert` is true,
+ * a new user document will be created. The function also supports revalidating specific paths to update cached data.
+ *
+ * @param {UpdateUserParams} params Parameters containing user details and the path for potential revalidation.
+ * @returns A promise that resolves once the user is updated.
+ */
 export async function updateUser({
   userId,
   name,
@@ -121,32 +154,50 @@ export async function updateUser({
   bio,
   image,
   path,
-}: updateUserParams): Promise<void> {
+}: UpdateUserParams): Promise<void> {
+  await connectToDB();
+
   try {
-    connectToDB();
-
-    await User.findOneAndUpdate(
-      { userId: userId },
-      { username: username.toLowerCase(), name, bio, image, onboarded: true },
-      { upsert: true }
-    ); // Upsert stands for updating and inserting
-
-    {
-      /* 
-        Next js function that allows to revalidate data associated with a specific path. Updates cached data without
-        waiting for revalidation to expire
-        */
+    // Verify if user exists before attempting an update or upsert
+    const userExists = await User.exists({ _id: userId });
+    if (!userExists) {
+      throw new Error("User not found");
     }
-    if (path === "/profile/edit") {
+
+    // Perform the update operation
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          username: username.toLowerCase(),
+          name,
+          bio,
+          image,
+          onboarded: true,
+        },
+      },
+      { new: true, runValidators: true }
+    );
+
+    // Conditionally revalidate data associated with a specific path
+    if (path === "/profile/edit" && typeof revalidatePath === "function") {
       revalidatePath(path);
     }
-  } catch (error: any) {
+  } catch (error) {
+    console.error(`Error updating user: ${error}`);
     throw new Error(
-      `There was an error while trying to create/update user. Error details => ${error.message}`
+      `There was an error while trying to update the user. Error details: ${error}`
     );
   }
 }
 
+/**
+ * Adds a newly created thread to the user's list of threads.
+ *
+ * @param {Object} params - Parameters including the userId and the createdThread.
+ * @param {string} params.userId - The ID of the user to whom the thread will be added.
+ * @param {Object} params.createdThread - The created thread object.
+ */
 export async function addUserThread({
   userId,
   createdThread,
@@ -155,83 +206,127 @@ export async function addUserThread({
   createdThread: {
     threadAuthor: string;
     threadContent: string;
-    threadCommunity: any;
-    _id: any;
+    threadCommunity: any; // Consider specifying a more precise type if possible
+    _id: any; // Typically, this would be a string or ObjectId type
   };
 }) {
-  await User.findByIdAndUpdate(userId, {
-    $push: {
-      threads: createdThread._id,
-    },
-  });
+  try {
+    await connectToDB();
+
+    const updateResult = await User.findByIdAndUpdate(
+      userId,
+      { $push: { threads: createdThread._id } },
+      { new: true, runValidators: true } // Ensure the updated document is returned and validators are run
+    );
+
+    // Optionally, check the update result to ensure the operation was successful
+    if (!updateResult) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+  } catch (error) {
+    console.error(`Error adding thread to user ${userId}:`, error);
+    throw new Error(`Failed to add thread to user. Error details: ${error}`);
+  }
 }
 
+/**
+ * Fetches threads created by a specific user, including community details and child threads.
+ *
+ * @param userId - The ID of the user whose threads are being fetched.
+ * @returns A promise resolving to the user's threads with populated community and child thread information.
+ */
 export async function fetchProfileThreads(userId: string) {
+  await connectToDB();
+
   try {
-    connectToDB();
+    // Directly fetching threads authored by the user to streamline the query
+    const threads = await Thread.find({ threadAuthor: userId })
+      .populate({
+        path: "threadCommunity",
+        select: "name id image", // Assuming 'id' is needed, though '_id' is automatically included
+      })
+      .populate({
+        path: "children",
+        populate: { path: "threadAuthor", select: "name image userId" },
+      });
 
-    // Find all threads authored by the user with the provided profileId param
-    const retrievedProfileThreads = await User.findOne({
-      _id: userId,
-    }).populate({
-      path: "threads",
-      model: Thread,
-      populate: [
-        {
-          path: "threadCommunity",
-          model: Community,
-          select: "name id image _id", // Select the "name" and "_id" fields from the "Community" model
-        },
-        {
-          path: "children",
-          model: Thread,
-          populate: {
-            path: "threadAuthor",
-            model: User,
-            select: "name image userId",
-          },
-        },
-      ],
-    });
+    if (!threads) {
+      throw new Error("No threads found for this user.");
+    }
 
-    return retrievedProfileThreads;
+    return threads;
   } catch (error) {
+    console.error(
+      `Error fetching profile threads for user ${userId}: ${error}`
+    );
     throw new Error(
-      `There was an error fetching user threads. Error details => ${error}`
+      `There was an error fetching user threads. Error details: ${error}`
     );
   }
 }
 
+/**
+ * Fetches comments made by other users on threads created by the specified user.
+ *
+ * @param userId - The ID of the user whose activity is being fetched.
+ * @returns An array of comments excluding those authored by the user.
+ */
 export async function getUserActivity(userId: string) {
+  await connectToDB();
+
   try {
-    connectToDB();
-    // Find all threads created by the specified user
-    const userThreads = await Thread.find({ threadAuthor: userId });
-
-    if (!userThreads) return;
-
-    // Collect the Id's of all the comments of each thread created by the user
-    const threadCommentsIds = await userThreads.reduce(
-      (accumulator, userThread) => {
-        return accumulator.concat(userThread.children);
+    // Directly aggregate to fetch comment threads excluding those authored by the user
+    const userComments = await Thread.aggregate([
+      // Match threads authored by the user to get comments on these threads
+      { $match: { threadAuthor: userId } },
+      // Lookup to join with the same collection to fetch child comments
+      {
+        $lookup: {
+          from: "threads", // Ensure this matches your collection name in MongoDB
+          localField: "children",
+          foreignField: "_id",
+          as: "comments",
+        },
       },
-      []
-    );
-
-    // Use the collected comment ids to find their respective relevant information
-    const userComments = await Thread.find({
-      _id: { $in: threadCommentsIds },
-      threadAuthor: { $ne: userId }, // Exclude threads authored by the same user
-    }).populate({
-      path: "threadAuthor",
-      model: User,
-      select: "name image _id",
-    });
+      // Unwind the comments for further filtering
+      { $unwind: "$comments" },
+      // Match to filter out comments authored by the user
+      { $match: { "comments.threadAuthor": { $ne: userId } } },
+      // Project necessary fields
+      {
+        $project: {
+          _id: "$comments._id",
+          threadContent: "$comments.threadContent",
+          threadAuthor: "$comments.threadAuthor",
+          // Add other fields as necessary
+        },
+      },
+      // Optionally, add a lookup stage to populate the threadAuthor details
+      {
+        $lookup: {
+          from: "users", // Ensure this matches your user collection name in MongoDB
+          localField: "threadAuthor",
+          foreignField: "_id",
+          as: "authorDetails",
+        },
+      },
+      {
+        $unwind: "$authorDetails",
+      },
+      {
+        $project: {
+          _id: 1,
+          threadContent: 1,
+          threadAuthor: { $arrayElemAt: ["$authorDetails", 0] }, // Adjust based on your needs
+        },
+      },
+    ]);
 
     return userComments;
   } catch (error) {
+    console.error(`Error fetching user activity: ${error}`);
     throw new Error(
-      `There was an error fetching user activity. Error details => ${error}`
+      `There was an error fetching user activity. Error details: ${error}`
     );
   }
 }

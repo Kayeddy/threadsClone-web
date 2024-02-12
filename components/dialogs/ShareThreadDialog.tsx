@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/router";
 
 export default function ShareThreadDialog({
   triggerImage,
@@ -23,16 +22,16 @@ export default function ShareThreadDialog({
   triggerImage: React.ReactNode;
   threadId: string;
 }) {
-  const pathname = window.location.href;
+  const pathname = typeof window !== "undefined" ? window.location.href : "";
   const threadLink = `${pathname}thread/${threadId}`;
   return (
     <Dialog>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-dark-2 text-white">
+      <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white">
         <DialogHeader>
           <DialogTitle className="text-light-1">Share Thread</DialogTitle>
           <DialogDescription className="text-light-2">
-            Anyone who has this link will be able to view this.
+            Anyone who has this link will be able to view your Thread.
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center space-x-2">

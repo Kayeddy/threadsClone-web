@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+/**
+ * Represents a community within the application, which can contain multiple threads
+ * and have multiple members. Each community is uniquely identified by its name and alias.
+ */
 const communitySchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true, unique: true },
@@ -24,13 +28,10 @@ const communitySchema = new mongoose.Schema({
   ],
 });
 
-{
-  /*
-    Whenever the application just starts the mongoose models is not going to exist in the database, therefore, 
-    the schema will be created from the second condition after the OR conditional. However, after the schema 
-    has been created and recognized, it will then fall back to using the models we provided internally.
-*/
-}
+// Indexes for efficient querying
+communitySchema.index({ name: 1 }); // Index on 'name' for quick lookup by name
+communitySchema.index({ image: 1 }); // Index on 'alias' for quick lookup by alias
+
 const Community =
   mongoose.models.Community || mongoose.model("Community", communitySchema);
 

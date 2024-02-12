@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ShareThreadDialog from "../dialogs/ShareThreadDialog";
 import CommentThreadDialog from "../dialogs/CommentThreadDialog";
+import RepostThreadDialog from "../dialogs/RepostThreadDialog";
 
 interface Props {
   threadId: string;
@@ -65,9 +66,9 @@ export default function ThreadCard({
           id: commentChild._id.toString(),
           content: commentChild.threadContent,
           author: {
-            authorId: commentChild.threadAuthor._id.toString(),
-            authorName: commentChild.threadAuthor.name,
-            authorImage: commentChild.threadAuthor.image,
+            authorId: "",
+            authorName: "",
+            authorImage: "",
           },
         };
       }),
@@ -154,13 +155,19 @@ export default function ThreadCard({
                     currentUserImage={currentUserImage}
                   />
 
-                  <Image
-                    src="/assets/repost.svg"
-                    alt="Thread_Repost_Icon"
-                    width={24}
-                    height={24}
-                    className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-                  ></Image>
+                  <RepostThreadDialog
+                    triggerImage={
+                      <Image
+                        src="/assets/repost.svg"
+                        alt="Thread_Repost_Icon"
+                        width={24}
+                        height={24}
+                        className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                      ></Image>
+                    }
+                    currentUserId={currentUserId}
+                    threadContent={threadContent}
+                  />
 
                   <ShareThreadDialog
                     triggerImage={

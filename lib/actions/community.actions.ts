@@ -7,6 +7,7 @@ import Thread from "../models/thread.model";
 import User from "../models/user.model";
 
 import { connectToDB } from "../mongoose";
+import { convertObjectIdToString } from "../utils";
 
 interface CreateCommunityProps {
   id: string;
@@ -31,6 +32,11 @@ interface updateCommunityInfoProps {
   image: string;
 }
 
+/**
+ * Creates a new community with the given details and associates it with the creator.
+ * @param {CreateCommunityProps} props - The properties required to create a community.
+ * @returns The created community document, with all ObjectId fields converted to strings.
+ */
 export async function createCommunity({
   id,
   name,
@@ -40,92 +46,112 @@ export async function createCommunity({
   createdByUserId,
 }: CreateCommunityProps) {
   try {
-    connectToDB();
+    await connectToDB();
 
-    // Find the user with the provided unique id
-    const communityCreatorId = await User.findOne({ id: createdByUserId });
+    const creator = await User.findOne({ userId: createdByUserId }, "_id");
+    if (!creator) throw new Error("User not found");
 
-    if (!communityCreatorId) {
-      throw new Error("User not found"); // Handle the case if the user with the id is not found
-    }
-
-    const newCommunity = new Community({
+    const newCommunity = await Community.create({
       id,
       name,
       alias,
       image,
       description,
-      createdBy: communityCreatorId._id, // Use the mongoose ID of the user
+      createdBy: creator._id,
     });
 
-    const createdCommunity = await newCommunity.save();
+    await User.findByIdAndUpdate(creator._id, {
+      $push: { communities: newCommunity._id },
+    });
 
-    // Update User model
-    communityCreatorId.communities.push(createdCommunity._id);
-    await communityCreatorId.save();
-
-    return createdCommunity;
+    return convertObjectIdToString(newCommunity);
   } catch (error) {
-    // Handle any errors
-    throw new Error(`Could not create community. Error details => ${error}`);
+    console.error(`Could not create community: ${error}`);
+    throw new Error("Failed to create community.");
   }
 }
 
+/**
+ * Fetches the details of a specific community by its ID.
+ * @param communityId - The unique identifier of the community to fetch.
+ * @returns The detailed information of the community, including the creator and members, with ObjectId fields converted to strings.
+ */
 export async function fetchCommunityDetails(communityId: string) {
   try {
-    connectToDB();
+    await connectToDB();
 
-    const communityDetails = await Community.findOne({ communityId }).populate([
-      "createdBy",
-      {
+    // Corrected the query to use '_id' for matching the community ID.
+    const communityDetails = await Community.findById(communityId)
+      .populate({
+        path: "createdBy",
+        model: User,
+        select: "name username image _id userId",
+      })
+      .populate({
         path: "members",
         model: User,
         select: "name username image _id userId",
-      },
-    ]);
+      })
+      .exec();
 
-    return communityDetails;
+    if (!communityDetails) {
+      throw new Error("Community not found");
+    }
+
+    // Convert ObjectId fields to strings for all nested objects
+    return convertObjectIdToString(communityDetails);
   } catch (error) {
-    throw new Error(
-      `Could not fetch community details. Error details => ${error}`
-    );
+    console.error(`Error fetching community details: ${error}`);
+    throw new Error("Failed to fetch community details.");
   }
 }
 
+/**
+ * Fetches posts associated with a specific community by its ID.
+ * Populates thread author and any children threads' authors for a comprehensive view.
+ * @param communityId - The unique identifier of the community whose posts are to be fetched.
+ * @returns A list of posts belonging to the community with populated author details, with ObjectId fields converted to strings.
+ */
 export async function fetchCommunityPosts(communityId: string) {
   try {
-    connectToDB();
+    await connectToDB();
 
-    const communityPosts = await Community.findById(communityId).populate({
-      path: "threads",
-      model: Thread,
-      populate: [
-        {
+    const communityPosts = await Community.findById(communityId)
+      .populate({
+        path: "threads",
+        populate: {
           path: "threadAuthor",
-          model: User,
-          select: "name image userId", // Select the "name" and "_id" fields from the "User" model
+          select: "name image userId",
         },
-        {
+      })
+      .populate({
+        path: "threads",
+        populate: {
           path: "children",
-          model: Thread,
           populate: {
             path: "threadAuthor",
-            model: User,
-            select: "image _id", // Select the "name" and "_id" fields from the "User" model
+            select: "name image userId",
           },
         },
-      ],
-    });
+      })
+      .exec();
 
-    return communityPosts;
+    if (!communityPosts) {
+      throw new Error("Community not found or has no posts.");
+    }
+
+    return convertObjectIdToString(communityPosts);
   } catch (error) {
-    // Handle any errors
-    throw new Error(
-      `Could not fetch community posts. Error details => ${error}`
-    );
+    console.error(`Error fetching community posts: ${error}`);
+    throw new Error("Failed to fetch community posts.");
   }
 }
 
+/**
+ * Fetches a list of communities based on search criteria, with pagination and optional sorting.
+ * @param {FetchCommunitiesProps} params - Parameters for search string, pagination, and sorting.
+ * @returns An object containing a list of communities that match the criteria and a flag indicating if there is a next page.
+ */
 export async function fetchCommunities({
   searchString = "",
   pageNumber = 1,
@@ -173,90 +199,119 @@ export async function fetchCommunities({
   }
 }
 
+/**
+ * Adds a member to a community by updating both the community's member list and the user's list of communities.
+ * Ensures that the user is not already a member before adding.
+ *
+ * @param communityId - The ID of the community to add the member to.
+ * @param memberId - The ID of the user to be added as a member.
+ * @returns The updated community object after adding the new member.
+ */
 export async function addMemberToCommunity(
   communityId: string,
   memberId: string
 ) {
   try {
-    connectToDB();
+    await connectToDB();
 
-    // Find the community by its unique id
-    const targetCommunity = await Community.findOne({ id: communityId });
+    const targetCommunity = await Community.findById(communityId);
+    const targetUser = await User.findOne({ userId: memberId });
 
     if (!targetCommunity) {
       throw new Error("Community not found");
     }
 
-    // Find the user by their unique id
-    const targetUser = await User.findOne({ userId: memberId });
-
     if (!targetUser) {
       throw new Error("User not found");
     }
 
-    // Check if the user is already a member of the community
-    if (targetCommunity.members.includes(targetUser._id)) {
-      throw new Error("User is already a member of the community");
+    // Perform the update and check the result
+    const updateResult = await Community.updateOne(
+      { _id: communityId },
+      { $addToSet: { members: targetUser._id } }
+    );
+
+    // Check if the operation modified any document
+    if (updateResult.matchedCount === 0) {
+      throw new Error(
+        "User is already a member of the community or update failed"
+      );
     }
 
-    // Add the user's _id to the members array in the community
-    targetCommunity.members.push(targetUser._id);
-    await targetCommunity.save();
+    await User.updateOne(
+      { _id: targetUser._id },
+      { $addToSet: { communities: communityId } }
+    );
 
-    // Add the community's _id to the communities array in the user
-    targetUser.communities.push(targetCommunity._id);
-    await targetUser.save();
+    // Optionally re-fetch the community to return updated data
+    // Note: Depending on your application's needs, you may choose to return the updatedCommunity or not
+    const updatedCommunity = await Community.findById(communityId).populate(
+      "members"
+    );
 
-    return targetCommunity;
+    return convertObjectIdToString(updatedCommunity);
   } catch (error) {
-    // Handle any errors
-    console.error("Error adding member to community. Error details => ", error);
-    throw error;
+    console.error("Error adding member to community: ", error);
+    throw new Error(`Failed to add member to community: ${error}`);
   }
 }
 
+/**
+ * Removes a user from a community by updating the community's member list
+ * and the user's list of communities.
+ *
+ * @param userId - The ID of the user to be removed from the community.
+ * @param communityId - The ID of the community from which the user is to be removed.
+ * @returns An object indicating the success of the operation.
+ */
 export async function removeUserFromCommunity(
   userId: string,
   communityId: string
 ) {
   try {
-    connectToDB();
+    await connectToDB();
 
-    const userIdObject = await User.findOne({ id: userId }, { _id: 1 });
-    const communityIdObject = await Community.findOne(
-      { id: communityId },
-      { _id: 1 }
-    );
+    // Simplify the search by directly using the given IDs for lookup.
+    const user = await User.findById(userId);
+    const community = await Community.findById(communityId);
 
-    if (!userIdObject) {
+    if (!user) {
       throw new Error("User not found");
     }
 
-    if (!communityIdObject) {
+    if (!community) {
       throw new Error("Community not found");
     }
 
-    // Remove the user's _id from the members array in the community
-    await Community.updateOne(
-      { _id: communityIdObject._id },
-      { $pull: { members: userIdObject._id } }
+    // Execute update operations to remove the user from the community and vice versa.
+    const updateCommunity = Community.updateOne(
+      { _id: communityId },
+      { $pull: { members: userId } }
     );
 
-    // Remove the community's _id from the communities array in the user
-    await User.updateOne(
-      { _id: userIdObject._id },
-      { $pull: { communities: communityIdObject._id } }
+    const updateUser = User.updateOne(
+      { _id: userId },
+      { $pull: { communities: communityId } }
     );
+
+    // Wait for both updates to complete.
+    await Promise.all([updateCommunity, updateUser]);
 
     return { success: true };
   } catch (error) {
-    // Handle any errors
+    console.error("Error removing user from community: ", error);
     throw new Error(
       `Could not remove user from community. Error details => ${error}`
     );
   }
 }
 
+/**
+ * Updates the specified information of a community.
+ *
+ * @param {updateCommunityInfoProps} params - The community ID and the new information to update.
+ * @returns The updated community object.
+ */
 export async function updateCommunityInfo({
   communityId,
   name,
@@ -264,57 +319,56 @@ export async function updateCommunityInfo({
   image,
 }: updateCommunityInfoProps) {
   try {
-    connectToDB();
+    await connectToDB();
 
-    // Find the community by its _id and update the information
-    const targetCommunity = await Community.findOneAndUpdate(
-      { id: communityId },
-      { name, alias, image }
+    // Correctly target the community by its _id and ensure the updated document is returned
+    const updatedCommunity = await Community.findOneAndUpdate(
+      { _id: communityId }, // Use _id for lookup
+      { $set: { name, alias, image } }, // Use $set to explicitly update fields
+      { new: true, runValidators: true } // Return the updated document and run schema validators
     );
 
-    if (!targetCommunity) {
+    if (!updatedCommunity) {
       throw new Error("Community not found");
     }
 
-    return targetCommunity;
+    // Convert ObjectId fields to strings if needed, assuming convertObjectIdToString function is implemented
+    return convertObjectIdToString(updatedCommunity);
   } catch (error) {
-    // Handle any errors
+    console.error(`Error updating community: ${error}`);
     throw new Error(`Could not update community. Error details => ${error}`);
   }
 }
 
+/**
+ * Deletes a community and all associated data, including threads and user community memberships.
+ *
+ * @param communityId - The ID of the community to be deleted.
+ * @returns The community object that was deleted.
+ */
 export async function deleteCommunity(communityId: string) {
   try {
-    connectToDB();
+    await connectToDB();
 
-    // Find the community by its ID and delete it
-    const targetCommunity = await Community.findOne({
-      id: communityId,
-    });
+    // Use findByIdAndDelete for a more direct approach, assuming communityId is the MongoDB _id.
+    const deletedCommunity = await Community.findByIdAndDelete(communityId);
 
-    if (!targetCommunity) {
+    if (!deletedCommunity) {
       throw new Error("Community not found");
     }
 
     // Delete all threads associated with the community
-    await Thread.deleteMany({ threadCommunity: targetCommunity._id });
-
-    // Find all users who are part of the community
-    const targetCommunityUsers = await User.find({
-      communities: targetCommunity._id,
-    });
+    await Thread.deleteMany({ threadCommunity: communityId });
 
     // Remove the community from the 'communities' array for each user
-    const updateUserPromises = targetCommunityUsers.map((user) => {
-      user.communities.pull(targetCommunity._id);
-      return user.save();
-    });
+    await User.updateMany(
+      { communities: communityId },
+      { $pull: { communities: communityId } }
+    );
 
-    await Promise.all(updateUserPromises);
-    await Community.deleteOne({ id: communityId }).exec();
-
-    return targetCommunity;
+    return convertObjectIdToString(deletedCommunity);
   } catch (error) {
+    console.error(`Error deleting community: ${error}`);
     throw new Error(`Could not delete community. Error details => ${error}`);
   }
 }

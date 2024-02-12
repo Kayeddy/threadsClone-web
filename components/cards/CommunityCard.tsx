@@ -79,7 +79,7 @@ export default async function CommunityCard({
             ))}
             {members.length >= 2 ? (
               <p className="ml-1 text-subtle-medium text-gray-1">
-                {members.length} + members
+                {members.length} members
               </p>
             ) : (
               <p className="ml-1 text-subtle-medium text-gray-1">

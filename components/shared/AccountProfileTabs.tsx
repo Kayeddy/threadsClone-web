@@ -6,7 +6,7 @@ import MembersTab from "../tabs/MembersTab";
 
 interface Props {
   userId: string;
-  accountThreads: [];
+  accountThreads: [] | any;
   accountId: string;
   accountImage: string;
   tabList: any[];
