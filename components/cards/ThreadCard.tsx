@@ -30,7 +30,7 @@ interface ThreadCardProps {
       image: string;
     };
   }[];
-  threadLikes: string[];
+  threadLikes?: string[];
   isComment?: boolean; // Not required
   isInCommunityPage?: boolean;
   renderCardInteractions: boolean;
@@ -265,7 +265,7 @@ export default function ThreadCard({
                   currentUserId={currentUserId}
                   currentUserImage={currentUserImage}
                   threadComments={commentsData}
-                  threadLikes={threadLikes}
+                  threadLikes={threadLikes ? threadLikes : []}
                 />
               )}
             </div>
