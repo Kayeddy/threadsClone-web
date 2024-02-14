@@ -7,11 +7,15 @@ import { fetchAllUsers, fetchUserData } from "@/lib/actions/user.actions";
 
 export default async function RightSidebar() {
   const currentLoggedInUser = await currentUser();
+  if (!currentLoggedInUser) return null;
+
   const currentLoggedInUserData = await fetchUserData(
     currentLoggedInUser ? currentLoggedInUser?.id : ""
   );
 
   if (!currentLoggedInUser) return null;
+
+  console.log(currentLoggedInUserData);
 
   const similarMinds = await fetchAllUsers({
     userId: currentLoggedInUserData._id,
