@@ -99,7 +99,7 @@ export async function fetchUserData(userId: string) {
     });
 
     if (!user) {
-      throw new Error("User not found");
+      return null;
     }
 
     return user; // Directly returning the user object.
@@ -160,25 +160,34 @@ export async function updateUser({
 
   try {
     // Verify if user exists before attempting an update or upsert
-    const userExists = await User.exists({ _id: userId });
-    if (!userExists) {
-      throw new Error("User not found");
-    }
+    const userExists = await User.exists({ userId: userId });
 
-    // Perform the update operation
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        $set: {
-          username: username.toLowerCase(),
-          name,
-          bio,
-          image,
-          onboarded: true,
+    if (!userExists) {
+      // If user does not exist then create user
+      await User.create({
+        userId: userId,
+        username: username.toLowerCase(),
+        name,
+        bio,
+        image,
+        onboarded: true,
+      });
+    } else {
+      // Perform the update operation
+      await User.findByIdAndUpdate(
+        userId,
+        {
+          $set: {
+            username: username.toLowerCase(),
+            name,
+            bio,
+            image,
+            onboarded: true,
+          },
         },
-      },
-      { new: true, runValidators: true }
-    );
+        { new: true, runValidators: true }
+      );
+    }
 
     // Conditionally revalidate data associated with a specific path
     if (path === "/profile/edit" && typeof revalidatePath === "function") {

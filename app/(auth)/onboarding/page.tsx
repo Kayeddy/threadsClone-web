@@ -25,8 +25,12 @@ async function page() {
   };
 
   if (!loggedInUser) redirect("/sign-in");
-  if (loggedInUser) console.log("logged in user: ", loggedInUser);
-  if (loggedInUser && currentLoggedInUserData?.onboarded) redirect("/");
+  if (
+    loggedInUser &&
+    currentLoggedInUserData &&
+    currentLoggedInUserData?.onboarded
+  )
+    redirect("/");
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col justify-start px-10 py-20">
