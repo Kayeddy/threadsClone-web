@@ -30,7 +30,7 @@ interface Props {
   currentUserImage: string | undefined;
 }
 
-export default async function CommentThreadDialog({
+export default function CommentThreadDialog({
   triggerImage,
   parentThread,
   comments,
