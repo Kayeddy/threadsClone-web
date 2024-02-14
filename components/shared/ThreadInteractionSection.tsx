@@ -33,7 +33,7 @@ export default function ThreadInteractionSection({
   const [threadLiked, setThreadLiked] = useState(
     threadLikes.includes(currentUserId ? currentUserId : "")
   );
-*/
+
   const threadLiked = useRef(
     threadLikes.includes(currentUserId ? currentUserId : "")
   );
@@ -48,10 +48,11 @@ export default function ThreadInteractionSection({
       currentUserId ? currentUserId : ""
     );
   };
-
+*/
   return (
     <div className="flex gap-3.5">
-      <Image
+      {/*
+        <Image
         src={
           threadLiked.current
             ? "/assets/heart-filled.svg"
@@ -65,6 +66,7 @@ export default function ThreadInteractionSection({
           await handleThreadLike();
         }}
       ></Image>
+        */}
 
       <CommentThreadDialog
         triggerImage={

@@ -66,7 +66,8 @@ export default function CommentCard({
 
           <div className="mt-5 flex flex-col gap-3 mb-4">
             <div className="flex gap-3.5">
-              <Image
+              {/*
+                <Image
                 src="/assets/heart-gray.svg"
                 alt="Thread_Heart_Reaction_Icon"
                 width={24}
@@ -74,6 +75,8 @@ export default function CommentCard({
                 className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
                 //onClick={handlePostLike}
               ></Image>
+                
+                */}
 
               <Image
                 src="/assets/reply.svg"
