@@ -277,7 +277,7 @@ export async function toggleLikeThread(
 
     // Optionally, re-fetch or return a status indicating the operation was successful
     const updatedThread = await Thread.findById(threadId);
-    console.log(updatedThread);
+
     return updatedThread;
   } catch (error) {
     console.error(`Error toggling like on thread: ${error}`);

@@ -29,12 +29,7 @@ export default function ThreadInteractionSection({
   currentUserId,
   currentUserImage,
 }: Props) {
-  /*
   const [threadLiked, setThreadLiked] = useState(
-    threadLikes.includes(currentUserId ? currentUserId : "")
-  );
-
-  const threadLiked = useRef(
     threadLikes.includes(currentUserId ? currentUserId : "")
   );
 
@@ -43,20 +38,17 @@ export default function ThreadInteractionSection({
       threadId,
       currentUserId ? currentUserId : ""
     );
-    //@ts-ignore
-    threadLiked.current = toggleThreadLikeResult.likes.includes(
-      currentUserId ? currentUserId : ""
+    setThreadLiked(
+      //@ts-ignore
+      toggleThreadLikeResult.likes.includes(currentUserId ? currentUserId : "")
     );
   };
-*/
+
   return (
     <div className="flex gap-3.5">
-      {/*
-        <Image
+      <Image
         src={
-          threadLiked.current
-            ? "/assets/heart-filled.svg"
-            : "/assets/heart-gray.svg"
+          threadLiked ? "/assets/heart-filled.svg" : "/assets/heart-gray.svg"
         }
         alt="Thread_Heart_Reaction_Icon"
         width={24}
@@ -66,7 +58,6 @@ export default function ThreadInteractionSection({
           await handleThreadLike();
         }}
       ></Image>
-        */}
 
       <CommentThreadDialog
         triggerImage={
