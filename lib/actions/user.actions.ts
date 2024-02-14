@@ -6,6 +6,7 @@ import { connectToDB } from "../mongoose";
 import Thread from "../models/thread.model";
 import { FilterQuery, SortOrder } from "mongoose";
 import Community from "../models/community.model";
+import { convertObjectIdToString } from "../utils";
 
 interface UpdateUserParams {
   userId: string;

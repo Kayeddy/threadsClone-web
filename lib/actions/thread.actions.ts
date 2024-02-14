@@ -11,6 +11,7 @@ interface ThreadCreationParams {
   threadContent: string;
   threadAuthor: string;
   threadCommunity: string | null;
+  likes?: string[] | null;
   path: string;
 }
 
@@ -85,24 +86,31 @@ export async function fetchThreads(
   const skipAmount = (pageNumber - 1) * pageSize;
 
   try {
-    const queryCriteria = { parentId: { $exists: false } }; // Simplified to target top-level threads.
+    const queryCriteria = { parentId: { $exists: false } }; // Targeting top-level threads.
 
     const totalThreadsCount = await Thread.countDocuments(queryCriteria);
     const threads = await Thread.find(queryCriteria)
-      .sort({ createdAt: -1 }) // Ensure sorting is explicitly defined for consistency.
+      .sort({ createdAt: -1 }) // Sorting by creation date, newest first.
       .skip(skipAmount)
       .limit(pageSize)
-      .populate("threadAuthor", "name image") // Simplify population with direct field selection.
-      .populate("threadCommunity", "name image description")
+      .populate("threadAuthor", "name image") // Populating author of the thread.
+      .populate("threadCommunity", "name image description") // Populating associated community.
       .populate({
         path: "children",
-        populate: { path: "threadAuthor", select: "name image" },
+        populate: [
+          {
+            path: "threadAuthor",
+            select: "name image",
+          },
+          {
+            path: "children",
+          },
+        ],
       })
-      .exec(); // Execute the query.
+      .exec(); // Execute the populated query.
 
     const isNext = totalThreadsCount > skipAmount + threads.length;
 
-    // Consider converting ObjectId to string if necessary for the client-side.
     return { threads, isNext };
   } catch (error) {
     console.error(`Error fetching threads: ${error}`);
@@ -147,9 +155,7 @@ export async function fetchThreadById(id: string) {
       throw new Error("Thread not found");
     }
 
-    // Optionally convert ObjectId fields to strings for the entire document structure
-    // Assuming convertObjectIdToString is adjusted to handle deep structures safely
-    return convertObjectIdToString(fetchedThread);
+    return fetchedThread;
   } catch (error) {
     console.error(`Error fetching thread by ID: ${error}`);
     throw new Error(
@@ -192,7 +198,6 @@ export async function commentThread({
       $push: { children: savedCommentThread._id },
     });
 
-    // Assuming revalidatePath is a custom function for cache invalidation or similar purposes
     if (typeof revalidatePath === "function") {
       revalidatePath(path);
     }
@@ -233,6 +238,76 @@ export async function fetchAllComments(threadId: string): Promise<any[]> {
       `Error fetching all comments for thread ${threadId}: ${error}`
     );
     throw new Error(`Failed to fetch comments. Error details: ${error}`);
+  }
+}
+
+/**
+ * Toggles the like status of a thread for a given user. If the user has already liked the thread, their like is removed. If not, their like is added.
+ *
+ * @param {string} threadId - The ID of the thread to be liked or unliked.
+ * @param {string} userId - The ID of the user performing the like or unlike action.
+ * @returns {Promise<Thread>} The updated thread document after the like or unlike operation.
+ * @throws {Error} Throws an error if the thread cannot be found or if there is a database operation failure.
+ */
+export async function toggleLikeThread(
+  threadId: string,
+  userId: string
+): Promise<typeof Thread> {
+  await connectToDB(); // Make sure you're connected to your database
+
+  try {
+    const thread = await Thread.findById(threadId);
+
+    if (!thread) {
+      throw new Error("Thread not found");
+    }
+
+    // Determine if the user has liked the thread
+    const userHasLiked = thread.likes.includes(userId);
+
+    if (userHasLiked) {
+      // If user has already liked the thread, remove their ID
+      await Thread.findByIdAndUpdate(threadId, { $pull: { likes: userId } });
+    } else {
+      // If user hasn't liked the thread yet, add their ID
+      await Thread.findByIdAndUpdate(threadId, {
+        $addToSet: { likes: userId },
+      });
+    }
+
+    // Optionally, re-fetch or return a status indicating the operation was successful
+    const updatedThread = await Thread.findById(threadId);
+    console.log(updatedThread);
+    return updatedThread;
+  } catch (error) {
+    console.error(`Error toggling like on thread: ${error}`);
+    throw new Error(`Could not toggle like on thread. Error details: ${error}`);
+  }
+}
+
+/**
+ * Retrieves the list of likes (user IDs) from a Thread given the Thread ID.
+ * @param {string} threadId - The ID of the Thread from which to retrieve the likes.
+ * @returns {Promise<string[]>} A promise that resolves to an array of user IDs who liked the Thread.
+ */
+export async function getLikesFromThread(threadId: string): Promise<string[]> {
+  await connectToDB(); // Make sure you're connected to your database
+
+  try {
+    // Find the Thread by its ID
+    const thread = await Thread.findById(threadId).select("likes -_id"); // Select only the likes array, exclude the _id
+
+    if (!thread) {
+      throw new Error("Thread not found");
+    }
+
+    // Return the likes array
+    return thread.likes;
+  } catch (error) {
+    console.error(`Error retrieving likes from thread: ${error}`);
+    throw new Error(
+      `Could not retrieve likes from thread. Error details: ${error}`
+    );
   }
 }
 

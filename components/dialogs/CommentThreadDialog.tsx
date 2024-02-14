@@ -1,6 +1,3 @@
-import { CopyIcon } from "@radix-ui/react-icons";
-
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -13,10 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  fetchAllComments,
-  fetchThreadById,
-} from "@/lib/actions/thread.actions";
+import { fetchAllComments } from "@/lib/actions/thread.actions";
 import DynamicCommentsTab from "../tabs/DynamicCommentsTab";
 import Image from "next/image";
 import ThreadCommentForm from "../forms/ThreadCommentForm";

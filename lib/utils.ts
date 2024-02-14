@@ -100,3 +100,21 @@ export function convertObjectIdToString(
   }
   return data;
 }
+
+/**
+ * Checks if a given user has liked a thread.
+ *
+ * @param likes Array of user IDs (as strings or ObjectId instances) who have liked the thread.
+ * @param userId The ID of the user to check for in the likes array.
+ * @returns {boolean} True if the user has liked the thread, false otherwise.
+ */
+export function isUserLikedThread(
+  likes: Array<string>,
+  userId: string
+): boolean {
+  // Convert all ObjectId instances in the likes array to strings for comparison
+  const likesAsString = likes.map((id) => id.toString());
+
+  // Check if userId is present in the likes array and return the result
+  return likesAsString.includes(userId);
+}

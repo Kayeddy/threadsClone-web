@@ -1,7 +1,6 @@
 import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchThreads } from "@/lib/actions/thread.actions";
 import { fetchUserData } from "@/lib/actions/user.actions";
-import { convertObjectIdToString } from "@/lib/utils";
 import { UserButton, currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
@@ -42,6 +41,9 @@ export default async function Home() {
                 threadCommunity={thread.threadCommunity}
                 createdAt={thread.createdAt}
                 threadComments={thread.children}
+                threadLikes={thread.likes.map((userId: any) => {
+                  return userId.toString();
+                })}
                 renderCardInteractions={true}
               />
             ))}

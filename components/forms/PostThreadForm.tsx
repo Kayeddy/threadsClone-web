@@ -50,6 +50,7 @@ function PostThreadForm({ userId }: { userId: string }) {
       threadAuthor: userId,
       threadCommunity: threadCommunityId,
       path: pathname,
+      likes: [],
     });
 
     router.push("/");

@@ -20,6 +20,7 @@ const threadSchema = new mongoose.Schema({
       ref: "Thread",
     },
   ],
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 // Index for efficient querying and sorting by creation date
