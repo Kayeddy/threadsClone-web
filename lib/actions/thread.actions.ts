@@ -325,45 +325,27 @@ export async function deleteThread(
   await connectToDB();
 
   try {
-    // Ensure the main thread exists before proceeding
-    const mainThreadExists = await Thread.exists({ _id: threadId });
-    if (!mainThreadExists) {
+    // Ensure the thread exists before proceeding
+    const threadToDelete = await Thread.findByIdAndDelete(threadId);
+    if (!threadToDelete) {
       throw new Error("Thread to delete not found");
     }
 
-    // Fetch all child threads and their descendants recursively
-    const descendantThreads = await fetchAllComments(threadId);
-
-    // Prepare an array of all thread IDs to delete (including the main thread)
-    const threadIdsToDelete = [
-      threadId,
-      ...descendantThreads.map((thread) => thread._id),
-    ];
-
-    // Perform the deletion of all threads in one operation
-    await Thread.deleteMany({ _id: { $in: threadIdsToDelete } });
-
-    // Construct sets of unique author and community IDs from the threads
-    const uniqueAuthorIds = new Set(
-      descendantThreads.map((thread) => thread.threadAuthor.toString())
-    );
-    const uniqueCommunityIds = new Set(
-      descendantThreads
-        .filter((thread) => thread.threadCommunity)
-        .map((thread) => thread.threadCommunity.toString())
-    );
-
-    // Update User and Community models to remove references to the deleted threads
+    // Update the User model
     await User.updateMany(
-      { _id: { $in: Array.from(uniqueAuthorIds) } },
-      { $pull: { threads: { $in: threadIdsToDelete } } }
-    );
-    await Community.updateMany(
-      { _id: { $in: Array.from(uniqueCommunityIds) } },
-      { $pull: { threads: { $in: threadIdsToDelete } } }
+      { threads: threadToDelete._id },
+      { $pull: { threads: threadToDelete._id } }
     );
 
-    // Invoke the revalidatePath function if it's part of your cache invalidation strategy or similar
+    // Update the Community model
+    if (threadToDelete.community) {
+      await Community.updateMany(
+        { threads: threadToDelete._id },
+        { $pull: { threads: threadToDelete._id } }
+      );
+    }
+
+    // Invoke the revalidatePath function
     if (typeof revalidatePath === "function") {
       revalidatePath(path);
     }

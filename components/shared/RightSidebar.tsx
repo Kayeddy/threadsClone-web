@@ -13,9 +13,7 @@ export default async function RightSidebar() {
     currentLoggedInUser ? currentLoggedInUser?.id : ""
   );
 
-  if (!currentLoggedInUser) return null;
-
-  console.log(currentLoggedInUserData);
+  if (!currentLoggedInUserData) return null;
 
   const similarMinds = await fetchAllUsers({
     userId: currentLoggedInUserData._id,

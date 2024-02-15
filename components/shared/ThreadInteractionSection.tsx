@@ -5,6 +5,7 @@ import RepostThreadDialog from "../dialogs/RepostThreadDialog";
 import ShareThreadDialog from "../dialogs/ShareThreadDialog";
 import { toggleLikeThread } from "@/lib/actions/thread.actions";
 import { useState, useRef } from "react";
+import DeleteThreadDialog from "../dialogs/DeleteThreadDialog";
 
 interface Props {
   threadId: string;
@@ -107,6 +108,21 @@ export default function ThreadInteractionSection({
         }
         threadId={threadId}
       />
+
+      {currentUserId === threadAuthor.id && (
+        <DeleteThreadDialog
+          triggerImage={
+            <Image
+              src="/assets/delete.svg"
+              alt="Thread_Share_Icon"
+              width={16}
+              height={16}
+              className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+            ></Image>
+          }
+          threadId={threadId}
+        />
+      )}
     </div>
   );
 }

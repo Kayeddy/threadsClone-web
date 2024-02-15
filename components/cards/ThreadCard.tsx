@@ -206,6 +206,8 @@ export default function ThreadCard({
 }: ThreadCardProps) {
   let commentsData: {}[] = [];
 
+  console.log(threadCommunity);
+
   if (renderCardInteractions) {
     commentsData = threadComments.map((comment) => ({
       threadId: comment._id.toString(),
@@ -268,18 +270,16 @@ export default function ThreadCard({
                   threadLikes={threadLikes ? threadLikes : []}
                 />
               )}
+
+              {/* Community Info Section, if applicable */}
+              <CommunityInfoSection
+                createdAt={createdAt}
+                threadCommunity={threadCommunity}
+                isInCommunityPage={isInCommunityPage}
+              />
             </div>
           </div>
         </div>
-
-        {/* Community Info Section, if applicable */}
-        {!isComment && (
-          <CommunityInfoSection
-            createdAt={createdAt}
-            threadCommunity={threadCommunity}
-            isInCommunityPage={isInCommunityPage}
-          />
-        )}
       </article>
     </article>
   );

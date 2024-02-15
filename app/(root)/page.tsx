@@ -18,8 +18,6 @@ export default async function Home() {
 
   const fetchThreadsResponse = await fetchThreads(1, 30);
 
-  console.log(fetchThreadsResponse.threads[0]);
-
   return (
     <>
       <div className="overflow-hidden flex flex-col relative">
@@ -53,6 +51,7 @@ export default async function Home() {
                     return userId.toString();
                   })}
                   renderCardInteractions={true}
+                  isComment={false}
                 />
               ))}
             </div>
