@@ -241,7 +241,7 @@ export async function addMemberToCommunity(
 
     await User.updateOne(
       { _id: targetUser._id },
-      { $addToSet: { communities: communityId } }
+      { $addToSet: { communities: targetCommunity._id } }
     );
 
     // Optionally re-fetch the community to return updated data
