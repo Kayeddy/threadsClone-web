@@ -99,7 +99,7 @@ export async function fetchCommunityDetails(communityId: string) {
     }
 
     // Convert ObjectId fields to strings for all nested objects
-    return convertObjectIdToString(communityDetails);
+    return communityDetails;
   } catch (error) {
     console.error(`Error fetching community details: ${error}`);
     throw new Error("Failed to fetch community details.");
@@ -113,34 +113,35 @@ export async function fetchCommunityDetails(communityId: string) {
  * @returns A list of posts belonging to the community with populated author details, with ObjectId fields converted to strings.
  */
 export async function fetchCommunityPosts(communityId: string) {
-  try {
-    await connectToDB();
+  await connectToDB();
 
-    const communityPosts = await Community.findById(communityId)
-      .populate({
-        path: "threads",
-        populate: {
+  try {
+    const communityPosts = await Community.findById(communityId).populate({
+      path: "threads",
+      model: Thread,
+      populate: [
+        {
           path: "threadAuthor",
-          select: "name image userId",
+          model: User,
+          select: "name image id", // Select the "name" and "_id" fields from the "User" model
         },
-      })
-      .populate({
-        path: "threads",
-        populate: {
+        {
           path: "children",
+          model: Thread,
           populate: {
             path: "threadAuthor",
-            select: "name image userId",
+            model: User,
+            select: "image _id", // Select the "name" and "_id" fields from the "User" model
           },
         },
-      })
-      .exec();
+      ],
+    });
 
     if (!communityPosts) {
       throw new Error("Community not found or has no posts.");
     }
 
-    return convertObjectIdToString(communityPosts);
+    return communityPosts;
   } catch (error) {
     console.error(`Error fetching community posts: ${error}`);
     throw new Error("Failed to fetch community posts.");

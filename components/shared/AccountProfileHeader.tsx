@@ -42,7 +42,6 @@ export default function AccountProfileHeader({
         </div>
       </div>
 
-      {/** TODO: comunnity */}
       <p className="mt-6 max-w-lg text-base-regular text-light-2">
         {accessedAccountBio}
       </p>

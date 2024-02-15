@@ -26,6 +26,8 @@ export default async function Page({ params }: { params: { id: string } }) {
   }
 
   const communityDetails = await fetchCommunityDetails(params.id);
+
+  console.log(communityDetails);
   const communityThreads = await fetchCommunityPosts(communityDetails._id);
 
   const profileHeaderProps = {
@@ -37,6 +39,8 @@ export default async function Page({ params }: { params: { id: string } }) {
     accessedAccountBio: communityDetails.bio,
     type: "Community",
   };
+
+  console.log(currentLoggedInUserData);
 
   const accountProfileTabsProps = {
     userId: currentLoggedInUserData._id,
