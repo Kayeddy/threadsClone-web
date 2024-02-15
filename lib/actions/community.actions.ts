@@ -228,7 +228,7 @@ export async function addMemberToCommunity(
 
     // Perform the update and check the result
     const updateResult = await Community.updateOne(
-      { _id: communityId },
+      { _id: targetCommunity._id },
       { $addToSet: { members: targetUser._id } }
     );
 
@@ -351,9 +351,12 @@ export async function deleteCommunity(communityId: string) {
   try {
     await connectToDB();
 
+    // Find the target community using the id field provided by Clerk
+    const targetCommunity = await Community.findOne({ id: communityId });
+
     // Use findByIdAndDelete for a more direct approach, assuming communityId is the MongoDB _id.
-    const deletedCommunity = await Community.findOneAndDelete({
-      id: communityId,
+    const deletedCommunity = await Community.findByIdAndDelete({
+      _id: targetCommunity._id,
     });
 
     if (!deletedCommunity) {
@@ -361,12 +364,12 @@ export async function deleteCommunity(communityId: string) {
     }
 
     // Delete all threads associated with the community
-    await Thread.deleteMany({ threadCommunity: communityId });
+    await Thread.deleteMany({ threadCommunity: targetCommunity._id });
 
     // Remove the community from the 'communities' array for each user
     await User.updateMany(
-      { communities: communityId },
-      { $pull: { communities: communityId } }
+      { communities: targetCommunity._id },
+      { $pull: { communities: targetCommunity._id } }
     );
 
     return deletedCommunity;
