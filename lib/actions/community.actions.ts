@@ -215,7 +215,7 @@ export async function addMemberToCommunity(
   try {
     await connectToDB();
 
-    const targetCommunity = await Community.findById(communityId);
+    const targetCommunity = await Community.findOne({ id: communityId });
     const targetUser = await User.findOne({ userId: memberId });
 
     if (!targetCommunity) {
@@ -352,7 +352,9 @@ export async function deleteCommunity(communityId: string) {
     await connectToDB();
 
     // Use findByIdAndDelete for a more direct approach, assuming communityId is the MongoDB _id.
-    const deletedCommunity = await Community.findByIdAndDelete(communityId);
+    const deletedCommunity = await Community.findOneAndDelete({
+      id: communityId,
+    });
 
     if (!deletedCommunity) {
       throw new Error("Community not found");
