@@ -369,7 +369,7 @@ export async function deleteCommunity(communityId: string) {
       { $pull: { communities: communityId } }
     );
 
-    return convertObjectIdToString(deletedCommunity);
+    return deletedCommunity;
   } catch (error) {
     console.error(`Error deleting community: ${error}`);
     throw new Error(`Could not delete community. Error details => ${error}`);
