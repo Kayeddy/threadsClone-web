@@ -48,16 +48,17 @@ export default async function Page({ params }: { params: { id: string } }) {
     accountType: "Community",
     accountMembers: communityDetails.members,
     renderCardInteractions: false,
-    isUserFromCommunity: currentLoggedInUserData.communities.map(
+    isUserFromCommunity: currentLoggedInUserData.communities.some(
       (community: any) => {
-        if (community._id.toString() === communityDetails._id.toString())
-          return true;
-        return false;
+        return community._id.toString() === communityDetails._id.toString();
       }
     ),
   };
 
-  console.log(currentLoggedInUserData.communities);
+  console.log(
+    "CurrentLoggedInUserCommunities",
+    currentLoggedInUserData.communities
+  );
 
   return (
     <section>

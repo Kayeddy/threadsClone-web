@@ -42,7 +42,7 @@ export default async function ThreadsTab({
           return <ThreadCard key={thread._id} {...threadCardProps} />;
         })
       ) : (
-        <p>No threads available.</p>
+        <p className="no-result">No threads available at this moment.</p>
       )}
     </section>
   );
