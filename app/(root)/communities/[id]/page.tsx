@@ -27,7 +27,6 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   const communityDetails = await fetchCommunityDetails(params.id);
 
-  console.log(communityDetails);
   const communityThreads = await fetchCommunityPosts(communityDetails._id);
 
   const profileHeaderProps = {
@@ -40,18 +39,25 @@ export default async function Page({ params }: { params: { id: string } }) {
     type: "Community",
   };
 
-  console.log(currentLoggedInUserData);
-
   const accountProfileTabsProps = {
-    userId: currentLoggedInUserData._id,
-    accountId: communityDetails._id,
+    userId: currentLoggedInUserData._id.toString(),
+    accountId: communityDetails._id.toString(),
     accountImage: currentLoggedInUserData.image,
     accountThreads: communityThreads.threads,
     tabList: communityTabs,
     accountType: "Community",
     accountMembers: communityDetails.members,
     renderCardInteractions: false,
+    isUserFromCommunity: currentLoggedInUserData.communities.map(
+      (community: any) => {
+        if (community._id.toString() === communityDetails._id.toString())
+          return true;
+        return false;
+      }
+    ),
   };
+
+  console.log(currentLoggedInUserData.communities);
 
   return (
     <section>

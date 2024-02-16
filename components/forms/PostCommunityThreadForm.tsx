@@ -25,7 +25,7 @@ import { useOrganization } from "@clerk/nextjs";
 
 //import { updateThread } from "@/lib/actions/user.actions";
 
-function PostThreadForm({ userId }: { userId: string }) {
+function PostCommunityThreadForm({ userId }: { userId: string }) {
   const { startUpload } = useUploadThing("media");
 
   const router = useRouter();
@@ -38,6 +38,7 @@ function PostThreadForm({ userId }: { userId: string }) {
       thread: "",
       accountId: userId,
     }, // Default values for fields within the form
+    disabled: !organization || !organization.id,
   });
 
   const onSubmit = async (
@@ -48,7 +49,7 @@ function PostThreadForm({ userId }: { userId: string }) {
     await createThread({
       threadContent: values.thread,
       threadAuthor: userId,
-      threadCommunity: "",
+      threadCommunity: threadCommunityId,
       path: pathname,
       likes: [],
     });
@@ -61,26 +62,36 @@ function PostThreadForm({ userId }: { userId: string }) {
       <Form {...formData}>
         <form
           onSubmit={formData.handleSubmit(onSubmit)}
-          className="flex flex-col justify-start gap-10 mt-10"
+          className="flex flex-col justify-start gap-2 mt-10"
         >
           <FormField
             control={formData.control}
             name="thread"
             render={({ field }) => (
               <FormItem className="flex flex-col gap-3 w-full">
-                <FormLabel className="text-base-semibold text-light-2 ">
-                  Thread content
-                </FormLabel>
                 <FormControl className="border border-dark-4 bg-dark-3 text-light-1 no-focus">
-                  <Textarea rows={15} {...field} />
+                  <Textarea
+                    rows={5}
+                    {...field}
+                    placeholder={
+                      !organization || !organization.id
+                        ? "Please switch to your organization profile to post Threads."
+                        : "Type your message here..."
+                    }
+                    className="resize-none disabled:placeholder:text-red-400"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <Button type="submit" className="bg-primary-500">
-            Post thread
+          <Button
+            type="submit"
+            disabled={!organization || !organization.id}
+            className="bg-primary-500 w-[150px]"
+          >
+            Post new Thread
           </Button>
         </form>
       </Form>
@@ -88,4 +99,4 @@ function PostThreadForm({ userId }: { userId: string }) {
   );
 }
 
-export default PostThreadForm;
+export default PostCommunityThreadForm;

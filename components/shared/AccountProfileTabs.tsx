@@ -3,6 +3,7 @@ import { profileTabs } from "@/constants";
 import Image from "next/image";
 import ThreadsTab from "../tabs/ThreadsTab";
 import MembersTab from "../tabs/MembersTab";
+import PostCommunityThreadForm from "../forms/PostCommunityThreadForm";
 
 interface Props {
   userId: string;
@@ -12,6 +13,8 @@ interface Props {
   tabList: any[];
   accountType: string;
   accountMembers?: any[] | null;
+  isInCommunity?: boolean;
+  isUserFromCommunity?: boolean;
   renderCardInteractions: boolean;
 }
 
@@ -24,6 +27,7 @@ export default function AccountProfileTabs({
   accountType,
   accountMembers,
   renderCardInteractions,
+  isUserFromCommunity = false,
 }: Props) {
   console.log(accountThreads);
   return (
@@ -66,14 +70,19 @@ export default function AccountProfileTabs({
           className="w-full text-light-1"
         >
           {tab.value === "threads" && (
-            <ThreadsTab
-              currentLoggedInUserId={userId}
-              accessedAccountId={accountId}
-              accessedAccountImage={accountImage}
-              accountThreads={accountThreads}
-              accountType={accountType}
-              renderCardInteractions={renderCardInteractions}
-            />
+            <div className="flex flex-col">
+              {isUserFromCommunity && (
+                <PostCommunityThreadForm userId={userId} />
+              )}
+              <ThreadsTab
+                currentLoggedInUserId={userId}
+                accessedAccountId={accountId}
+                accessedAccountImage={accountImage}
+                accountThreads={accountThreads}
+                accountType={accountType}
+                renderCardInteractions={renderCardInteractions}
+              />
+            </div>
           )}
           {tab.value === "replies" && null}
           {tab.value === "tagged" && null}
