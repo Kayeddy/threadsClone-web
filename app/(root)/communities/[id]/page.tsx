@@ -55,11 +55,6 @@ export default async function Page({ params }: { params: { id: string } }) {
     ),
   };
 
-  console.log(
-    "CurrentLoggedInUserCommunities",
-    currentLoggedInUserData.communities
-  );
-
   return (
     <section>
       <UserProfileHeader {...profileHeaderProps} />

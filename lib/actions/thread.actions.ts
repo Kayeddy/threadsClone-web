@@ -45,8 +45,10 @@ export async function createThread({
     const createdThread = await Thread.create({
       threadContent,
       threadAuthor,
-      community: communityIdObject, // Assign communityId if provided, or leave it null for personal account
+      threadCommunity: communityIdObject, // Assign communityId if provided, or leave it null for personal account
     });
+
+    console.log("Created Thread details in thread actions", createdThread);
 
     // Update User model
     await User.findByIdAndUpdate(threadAuthor, {
@@ -70,7 +72,7 @@ export async function createThread({
 }
 
 /**
- * Fetches threads with optional pagination, focusing on top-level threads.
+ * Fetches threads with optional pagination, focusing on top-level threads that don't belong to any communities.
  * Populates related data for thread author, community, and nested children threads.
  *
  * @param pageNumber - The current page number for pagination.
@@ -86,8 +88,17 @@ export async function fetchThreads(
   const skipAmount = (pageNumber - 1) * pageSize;
 
   try {
-    const queryCriteria = { parentId: { $exists: false } }; // Targeting top-level threads.
-
+    const queryCriteria = {
+      $and: [
+        { parentId: { $exists: false } }, // Checking for top-level threads.
+        {
+          $or: [
+            { threadCommunity: null },
+            { threadCommunity: { $exists: false } },
+          ],
+        }, // Checking threads that do not belong to any community.
+      ],
+    };
     const totalThreadsCount = await Thread.countDocuments(queryCriteria);
     const threads = await Thread.find(queryCriteria)
       .sort({ createdAt: -1 }) // Sorting by creation date, newest first.
@@ -338,12 +349,10 @@ export async function deleteThread(
     );
 
     // Update the Community model
-    if (threadToDelete.community) {
-      await Community.updateMany(
-        { threads: threadToDelete._id },
-        { $pull: { threads: threadToDelete._id } }
-      );
-    }
+    await Community.updateMany(
+      { threads: threadToDelete._id },
+      { $pull: { threads: threadToDelete._id } }
+    );
 
     // Invoke the revalidatePath function
     if (typeof revalidatePath === "function") {

@@ -48,7 +48,7 @@ function PostThreadForm({ userId }: { userId: string }) {
     await createThread({
       threadContent: values.thread,
       threadAuthor: userId,
-      threadCommunity: "",
+      threadCommunity: null,
       path: pathname,
       likes: [],
     });

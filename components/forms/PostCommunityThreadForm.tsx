@@ -53,8 +53,6 @@ function PostCommunityThreadForm({ userId }: { userId: string }) {
       path: pathname,
       likes: [],
     });
-
-    router.push("/");
   };
 
   return (
