@@ -63,7 +63,7 @@
   }
 
   .top-bar {
-    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-transparent px-6 py-3;
+    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-transparent px-6 py-3 max-md:bg-dark-2;
   }
 
   .bottom-bar {

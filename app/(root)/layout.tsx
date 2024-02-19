@@ -37,7 +37,7 @@ export default function RootLayout({
             <RightSidebar />
           </main>
           <BottomBar />
-          <div className="max-lg:hidden">
+          <div className="max-xl:hidden">
             <ScrollToTopIndicator />
           </div>
           <div className="gradient-background__wrapper">
