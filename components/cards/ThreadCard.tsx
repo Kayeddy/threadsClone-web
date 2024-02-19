@@ -233,54 +233,46 @@ export default function ThreadCard({
 
   return (
     <article
-      className={`flex-container w-full flex-col rounded-xl p-7 ${
-        isComment ? "px-0 xs:px-7" : "bg-dark-2"
-      }`}
+      className={`thread-card  ${isComment ? "px-0 xs:px-7" : "bg-dark-2"}`}
     >
-      <article
-        className={`flex-container w-full flex-col rounded-xl p-7 ${
-          isComment ? "px-0 xs:px-7" : "bg-dark-2"
-        }`}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex w-full flex-1 flex-row gap-4">
-            {/* Author Section */}
-            <AuthorSection
+      <div className="flex items-start justify-between">
+        <div className="flex w-full flex-1 flex-row gap-4">
+          {/* Author Section */}
+          <AuthorSection
+            currentUserId={currentUserId}
+            threadAuthor={threadAuthor}
+          />
+
+          <div className="flex flex-col">
+            {/* Content Section */}
+            <ContentSection
               currentUserId={currentUserId}
+              threadContent={threadContent}
               threadAuthor={threadAuthor}
             />
 
-            <div className="flex flex-col">
-              {/* Content Section */}
-              <ContentSection
-                currentUserId={currentUserId}
-                threadContent={threadContent}
+            {/* Interaction Section, if applicable */}
+            {renderCardInteractions && (
+              <InteractionSection
+                threadId={threadId}
                 threadAuthor={threadAuthor}
+                threadContent={threadContent}
+                currentUserId={currentUserId}
+                currentUserImage={currentUserImage}
+                threadComments={commentsData}
+                threadLikes={threadLikes ? threadLikes : []}
               />
+            )}
 
-              {/* Interaction Section, if applicable */}
-              {renderCardInteractions && (
-                <InteractionSection
-                  threadId={threadId}
-                  threadAuthor={threadAuthor}
-                  threadContent={threadContent}
-                  currentUserId={currentUserId}
-                  currentUserImage={currentUserImage}
-                  threadComments={commentsData}
-                  threadLikes={threadLikes ? threadLikes : []}
-                />
-              )}
-
-              {/* Community Info Section, if applicable */}
-              <CommunityInfoSection
-                createdAt={createdAt}
-                threadCommunity={threadCommunity}
-                isInCommunityPage={isInCommunityPage}
-              />
-            </div>
+            {/* Community Info Section, if applicable */}
+            <CommunityInfoSection
+              createdAt={createdAt}
+              threadCommunity={threadCommunity}
+              isInCommunityPage={isInCommunityPage}
+            />
           </div>
         </div>
-      </article>
+      </div>
     </article>
   );
 }

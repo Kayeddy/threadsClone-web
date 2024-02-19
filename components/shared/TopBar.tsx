@@ -6,9 +6,9 @@ import Link from "next/link";
 export default function TopBar() {
   return (
     <nav className="top-bar">
-      <Link href="/" className="flex items-center gap-4">
+      <Link href="/" className="flex items-center gap-4 max-lg:ml-3">
         <Image src="/assets/logo.svg" alt="logo" width={28} height={28} />
-        <p className="text-heading3-bold text-light-1 max-xs:hidden">Threads</p>
+        <p className="text-heading3-bold text-light-1 max-lg:hidden">Threads</p>
       </Link>
       <div className="flex items-center gap-1">
         <div className="block md:hidden">

@@ -10,15 +10,17 @@ import { redirect } from "next/navigation";
 export default async function Search({
   searchParams,
 }: {
-  searchParams: { [key: string]: string };
+  searchParams: { author: string; community: string; page: number };
 }) {
   const currentLoggedInUser = await currentUser();
   const currentLoggedInUserData = await fetchUserData(
     currentLoggedInUser ? currentLoggedInUser?.id : ""
   );
 
-  const searchingByAuthor = "author" in searchParams;
-  const searchingBycCommunity = "community" in searchParams;
+  const searchingByAuthor =
+    "author" in searchParams && searchParams.author.length > 0;
+  const searchingBycCommunity =
+    "community" in searchParams && searchParams.community.length > 0;
   const loadingSearch = "loading" in searchParams;
 
   let fetchedUsers: any = null;
@@ -42,7 +44,7 @@ export default async function Search({
 
   if (searchingBycCommunity) {
     fetchedCommunities = await fetchCommunities({
-      searchString: searchParams.q,
+      searchString: searchParams.community,
       pageNumber: searchParams?.page ? +searchParams.page : 1,
       pageSize: 25,
     });

@@ -7,6 +7,7 @@ import LeftSidebar from "@/components/shared/LeftSidebar";
 import RightSidebar from "@/components/shared/RightSidebar";
 import BottomBar from "@/components/shared/BottomMobileBar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import ScrollToTopIndicator from "@/components/shared/ScrollToTopIndicator";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       {/** <SpeedInsights /> */}
       <html lang="en">
         <body className={inter.className}>
+          <div className="gradient-line"></div>
           <TopBar />
           <main className="flex flex-row">
             <LeftSidebar />
@@ -35,6 +37,16 @@ export default function RootLayout({
             <RightSidebar />
           </main>
           <BottomBar />
+          <div className="max-lg:hidden">
+            <ScrollToTopIndicator />
+          </div>
+          <div className="gradient-background__wrapper">
+            <div className="gradient-background">
+              <div className="gradient-background__shape gradient-background__shape--1"></div>
+              <div className="gradient-background__shape gradient-background__shape--2"></div>
+            </div>
+            <div className="gradient-background__noise"></div>
+          </div>
         </body>
       </html>
     </ClerkProvider>

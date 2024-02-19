@@ -51,8 +51,8 @@ export async function fetchAllUsers({
       ...(searchString && {
         // Conditionally add search criteria if searchString is provided
         $or: [
-          { username: { $regex: regex, $options: "i" } }, // Case-insensitive search
-          { name: { $regex: regex, $options: "i" } },
+          { username: { $regex: regex } }, // Case-insensitive search is already specified in the regex constructor
+          { name: { $regex: regex } },
         ],
       }),
     };
@@ -282,61 +282,35 @@ export async function fetchProfileThreads(userId: string) {
  * @returns An array of comments excluding those authored by the user.
  */
 export async function getUserActivity(userId: string) {
-  await connectToDB();
-
   try {
-    // Directly aggregate to fetch comment threads excluding those authored by the user
-    const userComments = await Thread.aggregate([
-      // Match threads authored by the user to get comments on these threads
-      { $match: { threadAuthor: userId } },
-      // Lookup to join with the same collection to fetch child comments
-      {
-        $lookup: {
-          from: "threads", // Ensure this matches your collection name in MongoDB
-          localField: "children",
-          foreignField: "_id",
-          as: "comments",
-        },
+    connectToDB();
+    // Find all threads created by the specified user
+    const userThreads = await Thread.find({ threadAuthor: userId });
+
+    if (!userThreads) return;
+
+    // Collect the Id's of all the comments of each thread created by the user
+    const threadCommentsIds = await userThreads.reduce(
+      (accumulator, userThread) => {
+        return accumulator.concat(userThread.children);
       },
-      // Unwind the comments for further filtering
-      { $unwind: "$comments" },
-      // Match to filter out comments authored by the user
-      { $match: { "comments.threadAuthor": { $ne: userId } } },
-      // Project necessary fields
-      {
-        $project: {
-          _id: "$comments._id",
-          threadContent: "$comments.threadContent",
-          threadAuthor: "$comments.threadAuthor",
-          // Add other fields as necessary
-        },
-      },
-      // Optionally, add a lookup stage to populate the threadAuthor details
-      {
-        $lookup: {
-          from: "users", // Ensure this matches your user collection name in MongoDB
-          localField: "threadAuthor",
-          foreignField: "_id",
-          as: "authorDetails",
-        },
-      },
-      {
-        $unwind: "$authorDetails",
-      },
-      {
-        $project: {
-          _id: 1,
-          threadContent: 1,
-          threadAuthor: { $arrayElemAt: ["$authorDetails", 0] }, // Adjust based on your needs
-        },
-      },
-    ]);
+      []
+    );
+
+    // Use the collected comment ids to find their respective relevant information
+    const userComments = await Thread.find({
+      _id: { $in: threadCommentsIds },
+      threadAuthor: { $ne: userId },
+    }).populate({
+      path: "threadAuthor",
+      model: User,
+      select: "name image _id",
+    });
 
     return userComments;
   } catch (error) {
-    console.error(`Error fetching user activity: ${error}`);
     throw new Error(
-      `There was an error fetching user activity. Error details: ${error}`
+      `There was an error fetching user activity. Error details => ${error}`
     );
   }
 }

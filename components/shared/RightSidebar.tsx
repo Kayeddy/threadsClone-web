@@ -4,6 +4,7 @@ import UserCard from "../cards/UserCard";
 
 import { fetchCommunities } from "@/lib/actions/community.actions";
 import { fetchAllUsers, fetchUserData } from "@/lib/actions/user.actions";
+import CommunityCard from "../cards/CommunityCard";
 
 export default async function RightSidebar() {
   const currentLoggedInUser = await currentUser();
@@ -20,7 +21,9 @@ export default async function RightSidebar() {
     pageSize: 4,
   });
 
-  const suggestedCOmmunities = await fetchCommunities({ pageSize: 4 });
+  const suggestedCommunities = await fetchCommunities({ pageSize: 4 });
+
+  console.log("Suggested communities: ", suggestedCommunities.communities[0]);
 
   return (
     <section className="custom-scrollbar right-sidebar">
@@ -29,17 +32,19 @@ export default async function RightSidebar() {
           Suggested Communities
         </h3>
 
-        <div className="mt-7 flex w-[300px] flex-col gap-9">
-          {suggestedCOmmunities.communities.length > 0 ? (
+        <div className="mt-7 flex flex-col gap-4">
+          {suggestedCommunities.communities.length > 0 ? (
             <>
-              {suggestedCOmmunities.communities.map((community) => (
-                <UserCard
-                  key={community.id}
-                  userId={community.id}
+              {suggestedCommunities.communities.map((community) => (
+                <CommunityCard
+                  key={community._id}
+                  id={community._id}
                   name={community.name}
-                  username={community.username}
-                  userProfileImage={community.image}
-                  personType="Community"
+                  alias={community.username}
+                  imgUrl={community.image}
+                  members={community.members}
+                  createdBy={community.createdBy.toString()}
+                  isFromSidebar={true}
                 />
               ))}
             </>

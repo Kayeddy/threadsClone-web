@@ -21,7 +21,6 @@ export default async function Home() {
   return (
     <>
       <div className="overflow-hidden flex flex-col relative">
-        {" "}
         <section className="flex flex-row gap-4 items-center justify-start ml-2">
           <UserButton afterSignOutUrl="/" />
           <h1 className="head-text">Home</h1>

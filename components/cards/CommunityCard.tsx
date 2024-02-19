@@ -13,6 +13,7 @@ interface Props {
   members: {
     image: string;
   }[];
+  isFromSidebar?: boolean;
 }
 export default async function CommunityCard({
   id,
@@ -21,10 +22,15 @@ export default async function CommunityCard({
   imgUrl,
   createdBy,
   members,
+  isFromSidebar = false,
 }: Props) {
   const communityCreatorDetails = await fetchUserDataByDBId(createdBy);
   return (
-    <article className="community-card">
+    <article
+      className={`community-card ${
+        !isFromSidebar ? "bg-dark-3 sm:w-96 px-4" : "max-xs:p-4"
+      }`}
+    >
       <div className="flex flex-wrap items-center gap-3">
         <Link href={`/communities/${id}`} className="relative h-12 w-12">
           <Image
@@ -39,22 +45,29 @@ export default async function CommunityCard({
           <Link href={`/communities/${id}`}>
             <h4 className="text-base-semibold text-light-1">{name}</h4>
           </Link>
-          <p className="text-small-medium text-gray-1">@{alias}</p>
+          <Link
+            href={`/profile/${communityCreatorDetails._id}`}
+            className="hover:text-gray-200 transition-all duration-200 ease-in-out text-subtle-medium text-gray-1"
+          >
+            Created by @{communityCreatorDetails.username}
+          </Link>
         </div>
       </div>
 
-      <p className="mt-4 text-subtle-medium text-gray-1">
-        Created by {communityCreatorDetails && communityCreatorDetails.name}
-        <br />
-        <Link
-          href={`/profile/${communityCreatorDetails._id}`}
-          className="hover:text-gray-200 transition-all duration-200 ease-in-out"
-        >
-          <span>
-            @{communityCreatorDetails && communityCreatorDetails.username}
-          </span>
-        </Link>
-      </p>
+      {!isFromSidebar && (
+        <p className="mt-4 text-subtle-medium text-gray-1">
+          Created by {communityCreatorDetails && communityCreatorDetails.name}
+          <br />
+          <Link
+            href={`/profile/${communityCreatorDetails._id}`}
+            className="hover:text-gray-200 transition-all duration-200 ease-in-out"
+          >
+            <span>
+              @{communityCreatorDetails && communityCreatorDetails.username}
+            </span>
+          </Link>
+        </p>
+      )}
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <Link href={`/communities/${id}`}>
@@ -63,7 +76,7 @@ export default async function CommunityCard({
           </Button>
         </Link>
 
-        {members.length > 0 && (
+        {members.length > 0 && !isFromSidebar && (
           <div className="flex items-center">
             {members.map((member, index) => (
               <Image

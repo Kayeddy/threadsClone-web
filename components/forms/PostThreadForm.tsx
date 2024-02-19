@@ -22,10 +22,12 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { createThread } from "@/lib/actions/thread.actions";
 import { useOrganization } from "@clerk/nextjs";
+import { useState } from "react";
 
 //import { updateThread } from "@/lib/actions/user.actions";
 
 function PostThreadForm({ userId }: { userId: string }) {
+  const [postingThread, setPostingThread] = useState(false);
   const { startUpload } = useUploadThing("media");
 
   const router = useRouter();
@@ -43,6 +45,7 @@ function PostThreadForm({ userId }: { userId: string }) {
   const onSubmit = async (
     values: zodValidator.infer<typeof ThreadFormValidation>
   ) => {
+    setPostingThread(true);
     const threadCommunityId = !organization ? null : organization?.id;
 
     await createThread({
@@ -52,7 +55,6 @@ function PostThreadForm({ userId }: { userId: string }) {
       path: pathname,
       likes: [],
     });
-
     router.push("/");
   };
 
@@ -79,8 +81,12 @@ function PostThreadForm({ userId }: { userId: string }) {
             )}
           />
 
-          <Button type="submit" className="bg-primary-500">
-            Post thread
+          <Button
+            type="submit"
+            className="bg-primary-500"
+            disabled={postingThread}
+          >
+            {postingThread ? "Posting..." : "Post thread"}
           </Button>
         </form>
       </Form>
