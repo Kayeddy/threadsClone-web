@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Input } from "../ui/input";
-import Loader from "./Loader";
+import Loader from "./ContentLoader";
 
 export default function Searchbar() {
   const router = useRouter();

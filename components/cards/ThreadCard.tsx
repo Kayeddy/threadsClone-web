@@ -29,6 +29,7 @@ interface ThreadCardProps {
       name: string;
       image: string;
     };
+    threadLikes: string[];
   }[];
   threadLikes?: string[];
   isComment?: boolean; // Not required
@@ -206,30 +207,25 @@ export default function ThreadCard({
 }: ThreadCardProps) {
   let commentsData: {}[] = [];
 
-  console.log(threadCommunity);
-
   if (renderCardInteractions) {
     commentsData = threadComments.map((comment) => ({
       threadId: comment._id.toString(),
       threadContent: comment.threadContent,
-      children: comment.children.map((commentChild: any) => {
-        return {
-          id: commentChild._id.toString(),
-          content: commentChild.threadContent,
-          author: {
-            authorId: comment.threadAuthor._id.toString(),
-            authorName: comment.threadAuthor.name,
-            authorImage: comment.threadAuthor.image,
-          },
-        };
-      }),
+      children: [],
       threadAuthor: {
         id: comment.threadAuthor._id.toString(),
         name: comment.threadAuthor.name,
         image: comment.threadAuthor.image,
       },
+      //@ts-ignore
+      threadLikes: comment.likes.map((like) => {
+        return like.toString();
+      }),
+      //@ts-ignore
+      createdAt: comment.createdAt,
     }));
   }
+  console.log(commentsData);
 
   return (
     <article

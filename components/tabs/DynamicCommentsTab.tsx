@@ -22,7 +22,8 @@ export default function DynamicCommentsTab({
         currentUserId={currentUserId}
         commentContent={comment.threadContent}
         commentThreadId={comment.threadId}
-        commentChildren={comment.children}
+        threadLikes={comment.threadLikes}
+        createdAt={comment.createdAt}
         key={comment.id}
       />
     </div>

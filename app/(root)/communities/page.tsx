@@ -1,8 +1,5 @@
 import CommunityCard from "@/components/cards/CommunityCard";
 import { fetchCommunities } from "@/lib/actions/community.actions";
-import { fetchAllUsers, fetchUserData } from "@/lib/actions/user.actions";
-import { currentUser } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
 
 export default async function Communities() {
   const fetchCommunitiesParams = {

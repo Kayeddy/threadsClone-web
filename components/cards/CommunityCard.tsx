@@ -71,7 +71,10 @@ export default async function CommunityCard({
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <Link href={`/communities/${id}`}>
-          <Button size="sm" className="community-card_btn">
+          <Button
+            size="sm"
+            className="community-card_btn hover:scale-110 transition-all duration-300 ease-in-out"
+          >
             View
           </Button>
         </Link>

@@ -1,11 +1,8 @@
-import Image from "next/image";
 import { currentUser } from "@clerk/nextjs";
 
 import { communityTabs } from "@/constants";
 
 import UserProfileHeader from "@/components/shared/AccountProfileHeader";
-import ThreadsTab from "@/components/tabs/ThreadsTab";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { fetchUserData } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import {

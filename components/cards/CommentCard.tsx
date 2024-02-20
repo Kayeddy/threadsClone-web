@@ -1,9 +1,7 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import ThreadCommentChildForm from "../forms/ThreadCommentChildForm";
-import CommentChildCard from "./CommentChildCard";
+import ThreadInteractionSection from "../shared/ThreadInteractionSection";
+import { formatDateString } from "@/lib/utils";
 
 interface Props {
   commentAuthor: {
@@ -14,26 +12,26 @@ interface Props {
   currentUserId: string;
   commentContent: string;
   commentThreadId: string;
-  commentChildren?: any;
+  threadLikes: string[];
   createdAt?: string;
+  isInThreadPage?: boolean;
 }
 
 export default function CommentCard({
   commentAuthor,
   commentContent,
   commentThreadId,
-  commentChildren,
   currentUserId,
+  threadLikes,
   createdAt,
+  isInThreadPage = false,
 }: Props) {
-  const [isCommenting, setIsCommenting] = useState(false);
-
-  const handleCommenting = () => {
-    setIsCommenting(!isCommenting);
-  };
-
   return (
-    <div className="flex items-start justify-between p-7 bg-[#000000a2] rounded-lg w-[95%] my-4 transition-all duration-200 ease-in-out">
+    <div
+      className={`flex items-start justify-between p-6 bg-transparent hover:bg-[#000000a2] border-slate-300 border-[1px] transition-all duration-200 ease-in-out rounded-lg ${
+        isInThreadPage ? "w-full" : "w-[95%]"
+      } my-4 transition-all duration-200 ease-in-out`}
+    >
       <div className="flex w-full flex-1 flex-row gap-4">
         <div className="flex flex-col items-center">
           <Link
@@ -67,67 +65,20 @@ export default function CommentCard({
           </p>
 
           <div className="mt-5 flex flex-col gap-3 mb-4">
-            <div className="flex gap-3.5">
-              {/*
-                <Image
-                src="/assets/heart-gray.svg"
-                alt="Thread_Heart_Reaction_Icon"
-                width={24}
-                height={24}
-                className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-                //onClick={handlePostLike}
-              ></Image>
-                
-                */}
-
-              <Image
-                src="/assets/reply.svg"
-                alt="Thread_Reply_Icon"
-                width={24}
-                height={24}
-                className={`cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200 ${
-                  isCommenting && "brightness-200"
-                }`}
-                onClick={handleCommenting}
-              ></Image>
-            </div>
-            {isCommenting && (
-              <div className="flex flex-col h-[200px]">
-                <div className="h-[150px] overflow-hidden custom-scrollbar overflow-y-scroll">
-                  {commentChildren.length > 0 ? (
-                    commentChildren?.map((child: any) => (
-                      <CommentChildCard
-                        commentAuthor={child.author}
-                        commentContent={child.content}
-                        currentUserId={currentUserId}
-                      />
-                    ))
-                  ) : (
-                    <p className="no-result">No comments yet.</p>
-                  )}
-                </div>
-                <div className="mt-8">
-                  <ThreadCommentChildForm
-                    parentThreadId={commentThreadId}
-                    userId={commentAuthor.id}
-                  />
-                </div>
-              </div>
-            )}
-            {commentChildren && !isCommenting && commentChildren.length > 0 && (
-              <p
-                className="mt-1 text-subtle-medium text-gray-1 hover:underline cursor-pointer"
-                onClick={handleCommenting}
-              >
-                {commentChildren.length} replies
-              </p>
-            )}
+            <ThreadInteractionSection
+              threadId={commentThreadId}
+              threadAuthor={commentAuthor}
+              currentUserId={currentUserId}
+              threadLikes={threadLikes}
+              isComment={true}
+            />
           </div>
+
+          <p className="text-subtle-medium text-gray-1 mt-3">
+            {formatDateString(createdAt ? createdAt : "")}
+          </p>
         </div>
       </div>
-      {/** TODO: Delete thread functionality */}
-      {/** TODO: Show number of replies with recent replicants logos */}
-      {/** TODO: show Thread post time */}
     </div>
   );
 }

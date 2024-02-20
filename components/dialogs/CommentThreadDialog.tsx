@@ -40,7 +40,7 @@ export default function CommentThreadDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
-      <DialogContent className="max-w-[90vw] h-[550px] sm:max-w-xl bg-dark-2 text-white overflow-hidden flex flex-col">
+      <DialogContent className="max-w-[90vw] h-fit max-h-[570px] sm:max-w-xl bg-dark-3 text-white overflow-hidden flex flex-col">
         <DialogHeader className="flex flex-col">
           <DialogTitle className="text-light-1">
             <div className="flex flex-col items-start">

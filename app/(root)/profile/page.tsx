@@ -1,12 +1,7 @@
-import PostThreadForm from "@/components/forms/PostThreadForm";
 import UserProfileHeader from "@/components/shared/AccountProfileHeader";
 import AccountProfileTabs from "@/components/shared/AccountProfileTabs";
 import { profileTabs } from "@/constants";
-import {
-  fetchProfileThreads,
-  fetchUserData,
-  fetchUserDataByDBId,
-} from "@/lib/actions/user.actions";
+import { fetchProfileThreads, fetchUserData } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 

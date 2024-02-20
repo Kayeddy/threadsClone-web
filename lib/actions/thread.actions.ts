@@ -262,7 +262,8 @@ export async function fetchAllComments(threadId: string): Promise<any[]> {
  */
 export async function toggleLikeThread(
   threadId: string,
-  userId: string
+  userId: string,
+  path: string
 ): Promise<typeof Thread> {
   await connectToDB(); // Make sure you're connected to your database
 
@@ -288,6 +289,8 @@ export async function toggleLikeThread(
 
     // Optionally, re-fetch or return a status indicating the operation was successful
     const updatedThread = await Thread.findById(threadId);
+
+    revalidatePath(path);
 
     return updatedThread;
   } catch (error) {

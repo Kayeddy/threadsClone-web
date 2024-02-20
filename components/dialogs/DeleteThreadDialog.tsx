@@ -21,9 +21,14 @@ import { useEffect, useState } from "react";
 interface Props {
   triggerImage: React.ReactNode;
   threadId: string;
+  isComment?: boolean;
 }
 
-export default function DeleteThreadDialog({ triggerImage, threadId }: Props) {
+export default function DeleteThreadDialog({
+  triggerImage,
+  threadId,
+  isComment = false,
+}: Props) {
   const [threadDeleted, setThreadDeleted] = useState(false);
   const [loadingThreadDeletion, setLoadingThreadDeletion] = useState(false);
   const pathname = usePathname();
@@ -36,8 +41,8 @@ export default function DeleteThreadDialog({ triggerImage, threadId }: Props) {
   };
 
   const handleDialogReset = () => {
-    setLoadingThreadDeletion(false);
     setThreadDeleted(false);
+    setLoadingThreadDeletion(false);
   };
 
   return (
@@ -50,8 +55,10 @@ export default function DeleteThreadDialog({ triggerImage, threadId }: Props) {
           </DialogTitle>
           {!threadDeleted ? (
             <DialogDescription className="text-light-2">
-              Are you sure you want to delete this Thread? This action cannot be
-              undone.
+              {`Are you sure you want to delete this ${
+                isComment ? "comment" : "Thread"
+              }? This action cannot be
+              undone.`}
             </DialogDescription>
           ) : (
             <div className="w-[90%] h-full items-center justify-center">
@@ -81,7 +88,7 @@ export default function DeleteThreadDialog({ triggerImage, threadId }: Props) {
                 loadingThreadDeletion && "cursor-not-allowed"
               }`}
             >
-              Delete Thread
+              {`Delete ${isComment ? "comment" : "Thread"}`}
             </Button>
           ) : null}
         </DialogFooter>

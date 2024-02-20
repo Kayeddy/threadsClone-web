@@ -1,3 +1,4 @@
+import CommentCard from "@/components/cards/CommentCard";
 import ThreadCard from "@/components/cards/ThreadCard";
 import ThreadCommentForm from "@/components/forms/ThreadCommentForm";
 import { fetchThreadById } from "@/lib/actions/thread.actions";
@@ -46,26 +47,23 @@ export default async function Thread({ params }: { params: { id: string } }) {
       <div className="mt-10">
         {thread.children.map((commentThread: any) => {
           const commentThreadCardProps = {
-            threadId: commentThread._id.toString(),
-            currentUserId: currentLoggedInUser ? currentLoggedInUser?.id : null,
-            currentUserImage: currentLoggedInUserData.image,
-            parentId: commentThread.parentId ? commentThread.parentId : null,
-            threadContent: commentThread.threadContent,
-            threadAuthor: commentThread.threadAuthor,
-            threadCommunity: commentThread.threadCommunity,
+            commentThreadId: commentThread._id.toString(),
+            currentUserId: currentLoggedInUserData._id.toString(),
+            commentContent: commentThread.threadContent,
+            commentAuthor: {
+              name: commentThread.threadAuthor.name,
+              image: commentThread.threadAuthor.image,
+              id: commentThread.threadAuthor._id.toString(),
+            },
+            threadLikes: commentThread.likes.map((like: any) => {
+              return like.toString();
+            }),
             createdAt: commentThread.createdAt,
-            threadComments: commentThread.children,
-            renderCardInteractions: false,
+            isInThreadPage: true,
           };
 
-          console.log(commentThread);
-
           return (
-            <ThreadCard
-              key={commentThread._id}
-              {...commentThreadCardProps}
-              isComment
-            />
+            <CommentCard key={commentThread._id} {...commentThreadCardProps} />
           );
         })}
       </div>

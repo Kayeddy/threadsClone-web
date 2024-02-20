@@ -40,6 +40,7 @@ export default function RootLayout({
           <div className="max-xl:hidden">
             <ScrollToTopIndicator />
           </div>
+          {/* Gradient background */}
           <div className="gradient-background__wrapper">
             <div className="gradient-background">
               <div className="gradient-background__shape gradient-background__shape--1"></div>

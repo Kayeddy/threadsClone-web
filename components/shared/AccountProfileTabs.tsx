@@ -1,5 +1,4 @@
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
-import { profileTabs } from "@/constants";
 import Image from "next/image";
 import ThreadsTab from "../tabs/ThreadsTab";
 import MembersTab from "../tabs/MembersTab";

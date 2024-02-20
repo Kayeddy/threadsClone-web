@@ -1,4 +1,4 @@
-export default function Loader() {
+export default function ContentLoader() {
   return (
     <>
       <div className="three-body">
