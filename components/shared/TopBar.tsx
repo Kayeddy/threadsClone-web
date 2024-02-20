@@ -25,14 +25,16 @@ export default function TopBar() {
             </SignOutButton>
           </SignedIn>
         </div>
-        <OrganizationSwitcher
-          appearance={{
-            baseTheme: dark,
-            elements: {
-              organizationSwitcherTrigger: "py-2 px-4",
-            },
-          }}
-        />
+        <div className="w-fit h-fit xl:bg-glassmorphism border-transparent rounded-lg">
+          <OrganizationSwitcher
+            appearance={{
+              baseTheme: dark,
+              elements: {
+                organizationSwitcherTrigger: "py-2 px-4",
+              },
+            }}
+          />
+        </div>
       </div>
     </nav>
   );

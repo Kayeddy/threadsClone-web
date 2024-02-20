@@ -30,7 +30,7 @@ export default async function RightSidebar() {
           Suggested Communities
         </h3>
 
-        <div className="mt-7 flex flex-col gap-4">
+        <div className="mt-7 flex flex-col gap-10">
           {suggestedCommunities.communities.length > 0 ? (
             <>
               {suggestedCommunities.communities.map((community) => (

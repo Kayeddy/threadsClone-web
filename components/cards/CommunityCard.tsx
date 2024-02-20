@@ -28,7 +28,9 @@ export default async function CommunityCard({
   return (
     <article
       className={`community-card ${
-        !isFromSidebar ? "bg-dark-3 sm:w-96 px-4" : "max-xs:p-4"
+        !isFromSidebar
+          ? "bg-dark-3 sm:w-96 p-4"
+          : "flex flex-row justify-between items-center"
       }`}
     >
       <div className="flex flex-wrap items-center gap-3">
@@ -49,14 +51,14 @@ export default async function CommunityCard({
             href={`/profile/${communityCreatorDetails._id}`}
             className="hover:text-gray-200 transition-all duration-200 ease-in-out text-subtle-medium text-gray-1"
           >
-            Created by @{communityCreatorDetails.username}
+            By @{communityCreatorDetails.username}
           </Link>
         </div>
       </div>
 
       {!isFromSidebar && (
         <p className="mt-4 text-subtle-medium text-gray-1">
-          Created by {communityCreatorDetails && communityCreatorDetails.name}
+          By {communityCreatorDetails && communityCreatorDetails.name}
           <br />
           <Link
             href={`/profile/${communityCreatorDetails._id}`}
@@ -69,7 +71,11 @@ export default async function CommunityCard({
         </p>
       )}
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+      <div
+        className={`${
+          !isFromSidebar && "mt-5"
+        } flex flex-wrap items-center justify-between gap-3`}
+      >
         <Link href={`/communities/${id}`}>
           <Button
             size="sm"

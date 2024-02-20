@@ -275,6 +275,41 @@ export async function fetchProfileThreads(userId: string) {
   }
 }
 
+{
+  /*
+  
+  export async function fetchProfileCommunities(userId: string){
+  await connectToDB();
+
+  try {
+    // Directly fetching threads authored by the user to streamline the query
+    const threads = await Community.find({ threadAuthor: userId })
+      .populate({
+        path: "threadCommunity",
+        select: "name id image", // Assuming 'id' is needed, though '_id' is automatically included
+      })
+      .populate({
+        path: "children",
+        populate: { path: "threadAuthor", select: "name image userId" },
+      });
+
+    if (!threads) {
+      throw new Error("No threads found for this user.");
+    }
+
+    return threads;
+  } catch (error) {
+    console.error(
+      `Error fetching profile threads for user ${userId}: ${error}`
+    );
+    throw new Error(
+      `There was an error fetching user threads. Error details: ${error}`
+    );
+  }
+}
+  */
+}
+
 /**
  * Fetches comments made by other users on threads created by the specified user.
  *
