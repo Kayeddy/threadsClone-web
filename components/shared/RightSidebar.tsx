@@ -23,8 +23,6 @@ export default async function RightSidebar() {
 
   const suggestedCommunities = await fetchCommunities({ pageSize: 4 });
 
-  console.log("Suggested communities: ", suggestedCommunities.communities[0]);
-
   return (
     <section className="custom-scrollbar right-sidebar">
       <div className="flex flex-1 flex-col justify-start">

@@ -15,6 +15,7 @@ interface Props {
   commentContent: string;
   commentThreadId: string;
   commentChildren?: any;
+  createdAt?: string;
 }
 
 export default function CommentCard({
@@ -23,6 +24,7 @@ export default function CommentCard({
   commentThreadId,
   commentChildren,
   currentUserId,
+  createdAt,
 }: Props) {
   const [isCommenting, setIsCommenting] = useState(false);
 

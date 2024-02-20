@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   triggerImage: React.ReactNode;
@@ -25,11 +25,19 @@ interface Props {
 
 export default function DeleteThreadDialog({ triggerImage, threadId }: Props) {
   const [threadDeleted, setThreadDeleted] = useState(false);
+  const [loadingThreadDeletion, setLoadingThreadDeletion] = useState(false);
   const pathname = usePathname();
 
   const handleThreadDeletion = async () => {
+    setLoadingThreadDeletion(true);
     const deleteThreadResponse = await deleteThread(threadId, pathname);
+    setLoadingThreadDeletion(false);
     setThreadDeleted(true);
+  };
+
+  const handleDialogReset = () => {
+    setLoadingThreadDeletion(false);
+    setThreadDeleted(false);
   };
 
   return (
@@ -53,15 +61,14 @@ export default function DeleteThreadDialog({ triggerImage, threadId }: Props) {
         </DialogHeader>
         <DialogFooter className="sm:justify-start flex flex-row w-full items-center justify-around">
           <DialogClose asChild>
-            {!threadDeleted && (
+            {!loadingThreadDeletion && (
               <Button
                 type="button"
                 variant="secondary"
-                className={`${
-                  !threadDeleted ? "bg-red-300 hover:bg-red-400" : ""
-                }`}
+                className={` ${loadingThreadDeletion && "cursor-not-allowed"}`}
+                onClick={handleDialogReset}
               >
-                Cancel
+                {`${!threadDeleted ? "Cancel" : "Go back"}`}
               </Button>
             )}
           </DialogClose>
@@ -69,7 +76,10 @@ export default function DeleteThreadDialog({ triggerImage, threadId }: Props) {
             <Button
               type="button"
               variant="secondary"
-              onClick={handleThreadDeletion}
+              onClick={!loadingThreadDeletion ? handleThreadDeletion : () => {}}
+              className={`bg-red-300 hover:bg-red-400 ${
+                loadingThreadDeletion && "cursor-not-allowed"
+              }`}
             >
               Delete Thread
             </Button>

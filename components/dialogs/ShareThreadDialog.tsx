@@ -1,5 +1,5 @@
 "use client";
-import { CopyIcon } from "@radix-ui/react-icons";
+import { CopyIcon, CheckIcon } from "@radix-ui/react-icons";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 export default function ShareThreadDialog({
   triggerImage,
@@ -22,8 +23,25 @@ export default function ShareThreadDialog({
   triggerImage: React.ReactNode;
   threadId: string;
 }) {
+  const [linkCopied, setLinkCopied] = useState(false);
   const pathname = typeof window !== "undefined" ? window.location.href : "";
   const threadLink = `${pathname}thread/${threadId}`;
+
+  // Function to handle link copy
+  const handleCopyLink = () => {
+    navigator.clipboard
+      .writeText(threadLink)
+      .then(() => {
+        setLinkCopied(true);
+        setTimeout(() => {
+          setLinkCopied(false); // Reset after 3 seconds
+        }, 3000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy:", err);
+      });
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
@@ -50,10 +68,14 @@ export default function ShareThreadDialog({
             type="submit"
             size="sm"
             className="px-3"
-            onClick={() => navigator.clipboard.writeText(threadLink)}
+            onClick={handleCopyLink}
           >
             <span className="sr-only">Copy</span>
-            <CopyIcon className="h-4 w-4" />
+            {linkCopied ? (
+              <CheckIcon className="h-4 w-4" />
+            ) : (
+              <CopyIcon className="h-4 w-4" />
+            )}
           </Button>
         </div>
         <DialogFooter className="sm:justify-start">

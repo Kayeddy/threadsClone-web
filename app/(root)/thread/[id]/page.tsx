@@ -15,8 +15,6 @@ export default async function Thread({ params }: { params: { id: string } }) {
 
   if (!params.id || !currentLoggedInUser) return null;
   if (!currentLoggedInUserData.onboarded) redirect("/onboarding");
-  if (currentLoggedInUserData)
-    console.log(JSON.stringify(currentLoggedInUserData._id));
 
   const threadCardProps = {
     threadId: thread._id.toString(),
@@ -30,8 +28,6 @@ export default async function Thread({ params }: { params: { id: string } }) {
     threadComments: thread.children,
     renderCardInteractions: false,
   };
-
-  if (thread) console.log(thread._id);
 
   const threadCommentFormProps = {
     threadId: thread._id.toString(),
@@ -61,6 +57,8 @@ export default async function Thread({ params }: { params: { id: string } }) {
             threadComments: commentThread.children,
             renderCardInteractions: false,
           };
+
+          console.log(commentThread);
 
           return (
             <ThreadCard

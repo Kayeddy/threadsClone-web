@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   triggerImage: React.ReactNode;
@@ -29,9 +29,11 @@ export default function RepostThreadDialog({
   threadContent,
 }: Props) {
   const [threadReposted, setThreadReposted] = useState(false);
+  const [loadingThreadRepost, setLoadingThreadRepost] = useState(false);
   const pathname = usePathname();
 
   const handleThreadRepost = async () => {
+    setLoadingThreadRepost(true);
     await createThread({
       threadContent: threadContent,
       threadAuthor: currentUserId ? currentUserId : "",
@@ -39,7 +41,13 @@ export default function RepostThreadDialog({
       path: pathname,
     });
     setThreadReposted(true);
+    setLoadingThreadRepost(false);
   };
+
+  useEffect(() => {
+    setLoadingThreadRepost(false);
+    setThreadReposted(false);
+  }, []);
 
   return (
     <Dialog>
@@ -68,7 +76,7 @@ export default function RepostThreadDialog({
               variant="secondary"
               className={`${
                 !threadReposted ? "bg-red-300 hover:bg-red-400" : ""
-              }`}
+              } ${loadingThreadRepost && "cursor-not-allowed"}`}
             >
               {!threadReposted ? "Cancel" : "Go Back"}
             </Button>
@@ -77,7 +85,8 @@ export default function RepostThreadDialog({
             <Button
               type="button"
               variant="secondary"
-              onClick={handleThreadRepost}
+              onClick={!loadingThreadRepost ? handleThreadRepost : () => {}}
+              className={`${loadingThreadRepost && "cursor-not-allowed"}`}
             >
               Yes, repost
             </Button>
