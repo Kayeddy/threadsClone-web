@@ -99,6 +99,7 @@ const AuthorSection: React.FC<AuthorSectionProps> = ({
         src={threadAuthor.image}
         alt="Thread Author Profile Image"
         fill
+        sizes="32x32"
         className="cursor-pointer rounded-full"
       />
     </Link>
@@ -225,8 +226,6 @@ export default function ThreadCard({
       createdAt: comment.createdAt,
     }));
   }
-  console.log(commentsData);
-
   return (
     <article
       className={`thread-card  ${isComment ? "px-0 xs:px-7" : "bg-dark-2"}`}

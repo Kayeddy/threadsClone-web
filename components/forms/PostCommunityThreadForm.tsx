@@ -9,7 +9,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "../ui/form";
 
@@ -25,12 +24,21 @@ import { useOrganization } from "@clerk/nextjs";
 
 //import { updateThread } from "@/lib/actions/user.actions";
 
-function PostCommunityThreadForm({ userId }: { userId: string }) {
+function PostCommunityThreadForm({
+  userId,
+  clerkCommunityId,
+}: {
+  userId: string;
+  clerkCommunityId: string;
+}) {
   const { startUpload } = useUploadThing("media");
 
   const router = useRouter();
   const pathname = usePathname();
   const { organization } = useOrganization();
+
+  const enableFormCondition =
+    !organization || !organization.id || clerkCommunityId !== organization?.id;
 
   const formData = useForm({
     resolver: zodResolver(ThreadFormValidation), // Logic that takes care of the form's submission
@@ -38,7 +46,7 @@ function PostCommunityThreadForm({ userId }: { userId: string }) {
       thread: "",
       accountId: userId,
     }, // Default values for fields within the form
-    disabled: !organization || !organization.id,
+    disabled: enableFormCondition,
   });
 
   const onSubmit = async (
@@ -72,8 +80,8 @@ function PostCommunityThreadForm({ userId }: { userId: string }) {
                     rows={5}
                     {...field}
                     placeholder={
-                      !organization || !organization.id
-                        ? "Please switch to your organization profile to post Threads."
+                      enableFormCondition
+                        ? "Switch to the corresponding organization profile to post Threads."
                         : "Type your message here..."
                     }
                     className="resize-none disabled:placeholder:text-red-400"
@@ -86,7 +94,7 @@ function PostCommunityThreadForm({ userId }: { userId: string }) {
 
           <Button
             type="submit"
-            disabled={!organization || !organization.id}
+            disabled={enableFormCondition}
             className="bg-primary-500 w-[150px]"
           >
             Post new Thread

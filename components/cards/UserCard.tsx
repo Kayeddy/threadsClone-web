@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 interface Props {
   userId: string;
+  currentUserId?: string;
   name: string;
   username: string;
   userProfileImage: string;
@@ -13,6 +14,7 @@ interface Props {
 }
 export default function UserCard({
   userId,
+  currentUserId,
   name,
   username,
   userProfileImage,
@@ -32,7 +34,9 @@ export default function UserCard({
         />
 
         <div className="flex-1 text-ellipsis">
-          <h4 className="text-base-semibold text-light-1">{name}</h4>
+          <h4 className="text-base-semibold text-light-1">
+            {currentUserId === userId ? "You" : name}
+          </h4>
           <p className="text-small-medium text-gray-1">@{username}</p>
         </div>
       </div>

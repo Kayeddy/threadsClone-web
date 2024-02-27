@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   const accountProfileTabsProps = {
     userId: currentLoggedInUserData._id.toString(),
-    accountId: communityDetails._id.toString(),
+    accountId: communityDetails.id,
     accountImage: currentLoggedInUserData.image,
     accountThreads: communityThreads.threads,
     tabList: communityTabs,
@@ -47,7 +47,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     renderCardInteractions: false,
     isUserFromCommunity: currentLoggedInUserData.communities.some(
       (community: any) => {
-        return community._id.toString() === communityDetails._id.toString();
+        return community.id === communityDetails.id;
       }
     ),
   };

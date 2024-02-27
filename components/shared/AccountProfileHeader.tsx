@@ -11,13 +11,10 @@ interface Props {
 }
 
 export default function AccountProfileHeader({
-  accessedAccountUserId,
-  currentLoggedInUserId,
   accessedAccountName,
   accessedAcountUsername,
   accessedAcountProfileImage,
   accessedAccountBio,
-  type,
 }: Props) {
   return (
     <div className="flex w-ffull flex-col justify-start">

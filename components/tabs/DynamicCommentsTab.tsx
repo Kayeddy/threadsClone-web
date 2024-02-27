@@ -12,7 +12,10 @@ export default function DynamicCommentsTab({
   parentThreadId: string;
 }) {
   return commentsList.map((comment: any) => (
-    <div className="flex flex-col items-center gap-8 transition-all duration-200 ease-in-out">
+    <div
+      key={comment.threadId.toString()}
+      className="flex flex-col items-center gap-8 transition-all duration-200 ease-in-out"
+    >
       <CommentCard
         commentAuthor={{
           id: comment.threadAuthor.id,
@@ -24,7 +27,6 @@ export default function DynamicCommentsTab({
         commentThreadId={comment.threadId}
         threadLikes={comment.threadLikes}
         createdAt={comment.createdAt}
-        key={comment.id}
       />
     </div>
   ));

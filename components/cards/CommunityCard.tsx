@@ -7,7 +7,6 @@ import { fetchUserDataByDBId } from "@/lib/actions/user.actions";
 interface Props {
   id: string;
   name: string;
-  alias: string;
   imgUrl: string;
   createdBy: string;
   members: {
@@ -18,7 +17,6 @@ interface Props {
 export default async function CommunityCard({
   id,
   name,
-  alias,
   imgUrl,
   createdBy,
   members,
@@ -39,6 +37,7 @@ export default async function CommunityCard({
             src={imgUrl}
             alt="community_logo"
             fill
+            sizes="32x32"
             className="rounded-full object-cover"
           />
         </Link>

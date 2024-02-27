@@ -3,6 +3,7 @@ import Image from "next/image";
 import ThreadsTab from "../tabs/ThreadsTab";
 import MembersTab from "../tabs/MembersTab";
 import PostCommunityThreadForm from "../forms/PostCommunityThreadForm";
+import CommunityInvitationsTab from "../tabs/CommunityInvitationsTab";
 
 interface Props {
   userId: string;
@@ -28,7 +29,6 @@ export default function AccountProfileTabs({
   renderCardInteractions,
   isUserFromCommunity = false,
 }: Props) {
-  console.log(accountThreads);
   return (
     <Tabs defaultValue={tabList[0]?.value} className="w-full">
       <TabsList className="tab-list">
@@ -71,7 +71,10 @@ export default function AccountProfileTabs({
           {tab.value === "threads" && (
             <div className="flex flex-col">
               {isUserFromCommunity && (
-                <PostCommunityThreadForm userId={userId} />
+                <PostCommunityThreadForm
+                  userId={userId}
+                  clerkCommunityId={accountId}
+                />
               )}
               <ThreadsTab
                 currentLoggedInUserId={userId}
@@ -86,9 +89,12 @@ export default function AccountProfileTabs({
           {tab.value === "replies" && null}
           {tab.value === "tagged" && null}
           {tab.value === "members" && (
-            <MembersTab communityMembersList={accountMembers} />
+            <MembersTab
+              communityMembersList={accountMembers}
+              currentUserId={userId}
+            />
           )}
-          {tab.value === "requests" && null}
+          {tab.value === "invites" && <CommunityInvitationsTab />}
         </TabsContent>
       ))}
     </Tabs>

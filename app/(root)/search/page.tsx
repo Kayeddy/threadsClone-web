@@ -87,8 +87,6 @@ export default async function Search({
     }
   };
 
-  console.log("These are the search params gotten back:", searchParams);
-
   return (
     <section>
       <h1 className="head-text mb-10">Search</h1>

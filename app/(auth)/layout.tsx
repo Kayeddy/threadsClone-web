@@ -6,7 +6,7 @@ import "../globals.css";
 
 // SEO optimization
 export const metadata = {
-  title: "Threads clone",
+  title: "Threadsy",
   description: "A Next.js Meta Threads web application clone",
 };
 

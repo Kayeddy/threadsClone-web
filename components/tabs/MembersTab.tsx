@@ -2,8 +2,10 @@ import UserCard from "../cards/UserCard";
 
 export default function MembersTab({
   communityMembersList = null,
+  currentUserId,
 }: {
   communityMembersList?: any[] | null;
+  currentUserId: string;
 }) {
   return (
     <section className="mt-9 flex flex-col gap-10">
@@ -16,7 +18,7 @@ export default function MembersTab({
             userProfileImage: member.image,
             personType: "User",
           };
-          return <UserCard {...memberDetails} />;
+          return <UserCard {...memberDetails} currentUserId={currentUserId} />;
         })}
     </section>
   );

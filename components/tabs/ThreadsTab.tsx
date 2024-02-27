@@ -1,5 +1,4 @@
 import ThreadCard from "@/components/cards/ThreadCard";
-import { fetchProfileThreads } from "@/lib/actions/user.actions";
 
 interface Props {
   currentLoggedInUserId: string;
@@ -25,7 +24,7 @@ export default async function ThreadsTab({
           const threadCardProps = {
             threadId: thread._id,
             currentUserId: currentLoggedInUserId,
-            parentId: thread.parentId ? thread.parentId : null,
+            parentId: thread.parentId ? thread.parentId.toString() : null,
             threadContent: thread.threadContent,
             threadAuthor: {
               name: thread.threadAuthor.name,
@@ -39,7 +38,9 @@ export default async function ThreadsTab({
             renderCardInteractions: renderCardInteractions,
           };
 
-          return <ThreadCard key={thread._id} {...threadCardProps} />;
+          return (
+            <ThreadCard key={thread._id.toString()} {...threadCardProps} />
+          );
         })
       ) : (
         <p className="no-result">No threads available at this moment.</p>

@@ -46,6 +46,7 @@ export default function CommentCard({
               src={commentAuthor.image}
               alt="Thread_Author_Profile_Image"
               fill
+              sizes="32x32"
               className="cursor-pointer rounded-full"
             />
           </Link>

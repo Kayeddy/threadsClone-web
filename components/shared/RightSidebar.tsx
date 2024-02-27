@@ -3,7 +3,11 @@ import { currentUser } from "@clerk/nextjs";
 import UserCard from "../cards/UserCard";
 
 import { fetchCommunities } from "@/lib/actions/community.actions";
-import { fetchAllUsers, fetchUserData } from "@/lib/actions/user.actions";
+import {
+  fetchAllUsers,
+  fetchUserData,
+  fetchUserCommunities,
+} from "@/lib/actions/user.actions";
 import CommunityCard from "../cards/CommunityCard";
 
 export default async function RightSidebar() {
@@ -21,34 +25,34 @@ export default async function RightSidebar() {
     pageSize: 4,
   });
 
+  const userCommunities = await fetchUserCommunities(
+    currentLoggedInUserData._id
+  );
   const suggestedCommunities = await fetchCommunities({ pageSize: 4 });
 
   return (
     <section className="custom-scrollbar right-sidebar">
       <div className="flex flex-1 flex-col justify-start">
-        <h3 className="text-heading4-medium text-light-1">
-          Suggested Communities
-        </h3>
+        <h3 className="text-heading4-medium text-light-1">My Communities</h3>
 
         <div className="mt-7 flex flex-col gap-10">
           {suggestedCommunities.communities.length > 0 ? (
             <>
-              {suggestedCommunities.communities.map((community) => (
+              {userCommunities.map((community: any) => (
                 <CommunityCard
-                  key={community._id}
-                  id={community._id}
+                  key={community._id.toString()}
+                  id={community._id.toString()}
                   name={community.name}
-                  alias={community.username}
                   imgUrl={community.image}
                   members={community.members}
-                  createdBy={community.createdBy.toString()}
+                  createdBy={community.createdBy._id.toString()}
                   isFromSidebar={true}
                 />
               ))}
             </>
           ) : (
             <p className="!text-base-regular text-light-3">
-              No communities yet
+              You're currently not part of any community :(
             </p>
           )}
         </div>

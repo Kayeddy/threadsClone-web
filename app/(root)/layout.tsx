@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 // SEO optimization
 export const metadata = {
-  title: "Threads clone",
+  title: "Threadsy",
   description: "A Next.js Meta Threads web application clone",
 };
 
@@ -24,7 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <SpeedInsights />
+      {/**
+       <SpeedInsights />
+       */}
       <html lang="en">
         <body className={inter.className}>
           <div className="gradient-line"></div>

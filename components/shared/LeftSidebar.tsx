@@ -2,6 +2,7 @@
 
 import { sidebarLinks } from "@/constants";
 import { SignOutButton, SignedIn } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 export default function LeftSidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const orgDetails = useOrganization();
 
   return (
     <section className="custom-scrollbar left-sidebar">

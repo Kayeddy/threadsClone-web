@@ -275,41 +275,42 @@ export async function fetchProfileThreads(userId: string) {
   }
 }
 
-{
-  /*
-  
-  export async function fetchProfileCommunities(userId: string){
+/**
+ * Fetches all the communities a user is part of.
+ *
+ * @param userId - The ID of the user whose communities are being fetched.
+ * @returns An array of communities with specific fields.
+ */
+export async function fetchUserCommunities(userId: string) {
   await connectToDB();
 
   try {
-    // Directly fetching threads authored by the user to streamline the query
-    const threads = await Community.find({ threadAuthor: userId })
-      .populate({
-        path: "threadCommunity",
-        select: "name id image", // Assuming 'id' is needed, though '_id' is automatically included
-      })
-      .populate({
-        path: "children",
-        populate: { path: "threadAuthor", select: "name image userId" },
-      });
+    const userWithCommunities = await User.findById(userId).populate({
+      path: "communities",
+      select: "id name members image description createdBy",
+      // Populate the createdBy field to get the user details who created the community
+      populate: {
+        path: "createdBy",
+        model: User,
+        select: "username",
+      },
+    });
 
-    if (!threads) {
-      throw new Error("No threads found for this user.");
+    if (!userWithCommunities) {
+      throw new Error("User not found.");
     }
 
-    return threads;
+    // Extract the populated communities from the user document.
+    const { communities } = userWithCommunities;
+
+    return communities;
   } catch (error) {
-    console.error(
-      `Error fetching profile threads for user ${userId}: ${error}`
-    );
+    console.error(`Error fetching user's communities: ${error}`);
     throw new Error(
-      `There was an error fetching user threads. Error details: ${error}`
+      `Failed to fetch user's communities. Error details: ${error}`
     );
   }
 }
-  */
-}
-
 /**
  * Fetches comments made by other users on threads created by the specified user.
  *

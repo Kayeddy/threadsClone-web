@@ -29,7 +29,7 @@ export default async function Home() {
           {fetchThreadsResponse.threads.length === 0 ? (
             <p className="no-result">No threads available at this moment</p>
           ) : (
-            <div className="h-auto overflow-x-hidden overflow-y-auto relative flex flex-col gap-10 py-10">
+            <div className="h-auto overflow-x-hidden overflow-y-auto relative flex flex-col gap-10 py-10 ">
               {fetchThreadsResponse.threads.map((thread: any) => (
                 <ThreadCard
                   key={thread._id.toString()}
