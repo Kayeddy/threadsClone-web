@@ -78,7 +78,6 @@ export default async function Search({
           key={community.id}
           id={community._id.toString()}
           name={community.name}
-          alias={community.alias}
           imgUrl={community.image}
           createdBy={community.createdBy.toString()}
           members={community.members}
