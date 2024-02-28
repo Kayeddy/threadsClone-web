@@ -12,14 +12,12 @@ export default async function Home() {
   const currentLoggedInUser = await currentUser();
   if (!currentLoggedInUser) {
     redirect("/sign-in");
-    return null; // Prevent further execution after redirect
   }
 
   try {
     const currentLoggedInUserData = await fetchUserData(currentLoggedInUser.id);
     if (!currentLoggedInUserData?.onboarded) {
       redirect("/onboarding");
-      return null; // Prevent further execution after redirect
     }
 
     const fetchThreadsResponse = await fetchThreads(1, 30);
