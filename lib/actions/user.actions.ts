@@ -164,14 +164,17 @@ export async function updateUser({
 
     if (!userExists) {
       // If user does not exist then create user
-      await User.create({
-        userId: userId,
-        username: username.toLowerCase(),
-        name,
-        bio,
-        image,
-        onboarded: true,
-      });
+      await User.create(
+        {
+          userId: userId,
+          username: username.toLowerCase(),
+          name,
+          bio,
+          image,
+          onboarded: true,
+        },
+        { new: true, runValidators: true }
+      );
     } else {
       // Perform the update operation
       await User.findByIdAndUpdate(

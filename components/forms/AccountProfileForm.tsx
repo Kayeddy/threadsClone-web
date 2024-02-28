@@ -8,7 +8,6 @@ import { useUploadThing } from "@/lib/uploadThing";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,14 +38,23 @@ interface Props {
   buttonTitle: string;
 }
 
-const AccountProfileForm = ({ currentUserData, buttonTitle }: Props) => {
+/**
+ * A form component for updating the account profile of a user.
+ * It allows for updating the user's name, username, bio, and profile image.
+ *
+ * @param {Props} props - The props for the AccountProfileForm component.
+ * @returns {JSX.Element} The AccountProfileForm component.
+ */
+const AccountProfileForm = ({ currentUserData }: Props) => {
   const [files, setFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { startUpload } = useUploadThing("media");
 
   const router = useRouter();
   const pathname = usePathname();
 
+  // Setup form handling with react-hook-form and Zod schema validation
   const formData = useForm({
     resolver: zodResolver(userFormDataValidation), // Logic that takes care of the form's submission
     defaultValues: {
@@ -57,6 +65,13 @@ const AccountProfileForm = ({ currentUserData, buttonTitle }: Props) => {
     }, // Default values for fields within the form
   });
 
+  /**
+   * Handles the uploading of a profile image, converting it to a Base64 URL.
+   * Sets the file to the local state and updates the form value.
+   *
+   * @param {ChangeEvent<HTMLInputElement>} e - The event triggered on file input change.
+   * @param {Function} fieldChange - Function to update the form field value.
+   */
   const handleProfileImageUpload = (
     e: ChangeEvent<HTMLInputElement>,
     fieldChange: (value: string) => void
@@ -81,6 +96,11 @@ const AccountProfileForm = ({ currentUserData, buttonTitle }: Props) => {
     }
   };
 
+  /**
+   * Handles the profile image submission, uploading it if it's a new image.
+   *
+   * @param {any} values - The form values including the potentially new profile image.
+   */
   const handleProfileImageSubmission = async (
     values: zodValidator.infer<typeof userFormDataValidation>
   ) => {
@@ -96,10 +116,17 @@ const AccountProfileForm = ({ currentUserData, buttonTitle }: Props) => {
     }
   };
 
+  /**
+   * The onSubmit function for the form. It handles image submission,
+   * updates the user profile, and navigates accordingly.
+   *
+   * @param {zodValidator.infer<typeof userFormDataValidation>} values - The validated form values.
+   */
   const onSubmit = async (
     values: zodValidator.infer<typeof userFormDataValidation>
   ) => {
-    handleProfileImageSubmission(values);
+    setIsSubmitting(true); // Prevent further submissions during processing.
+    await handleProfileImageSubmission(values);
 
     await updateUser({
       username: values.username,
@@ -110,11 +137,8 @@ const AccountProfileForm = ({ currentUserData, buttonTitle }: Props) => {
       path: pathname,
     });
 
-    if (pathname === "/profile/edit") {
-      router.back();
-    } else {
-      router.push("/");
-    }
+    setIsSubmitting(false); // Re-enable the submit button after processing
+    router.push("/");
   };
 
   return (
@@ -229,8 +253,12 @@ const AccountProfileForm = ({ currentUserData, buttonTitle }: Props) => {
             )}
           />
 
-          <Button type="submit" className="bg-primary-500">
-            Submit
+          <Button
+            type="submit"
+            className="bg-primary-500"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         </form>
       </Form>
