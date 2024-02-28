@@ -14,6 +14,14 @@ interface Props {
   }[];
   isFromSidebar?: boolean;
 }
+
+/**
+ * Renders a card component for a community with details and interactions.
+ * This component fetches the community creator's details asynchronously.
+ *
+ * @param {Props} props The properties of the community card.
+ * @returns {JSX.Element} The CommunityCard component.
+ */
 export default async function CommunityCard({
   id,
   name,
@@ -22,6 +30,7 @@ export default async function CommunityCard({
   members,
   isFromSidebar = false,
 }: Props) {
+  // Fetching community creator details asynchronously.
   const communityCreatorDetails = await fetchUserDataByDBId(createdBy);
   return (
     <article
@@ -90,23 +99,17 @@ export default async function CommunityCard({
               <Image
                 key={index}
                 src={member.image}
-                alt={`user_${index}`}
+                alt={`Community member ${index}`}
                 width={28}
                 height={28}
                 className={`${
-                  index !== 0 && "-ml-2"
+                  index !== 0 ? "-ml-2" : ""
                 } rounded-full object-cover`}
               />
             ))}
-            {members.length >= 2 ? (
-              <p className="ml-1 text-subtle-medium text-gray-1">
-                {members.length} members
-              </p>
-            ) : (
-              <p className="ml-1 text-subtle-medium text-gray-1">
-                {members.length} member
-              </p>
-            )}
+            <p className="ml-1 text-subtle-medium text-gray-1">
+              {members.length} member{members.length > 1 ? "s" : ""}
+            </p>
           </div>
         )}
       </div>

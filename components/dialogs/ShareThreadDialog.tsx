@@ -14,8 +14,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
+/**
+ * Component to display a dialog for sharing a thread via a link.
+ *
+ * @param {object} props Component props
+ * @param {React.ReactNode} props.triggerImage Element to trigger the dialog.
+ * @param {string} props.threadId ID of the thread to share.
+ */
 export default function ShareThreadDialog({
   triggerImage,
   threadId,
@@ -23,27 +30,38 @@ export default function ShareThreadDialog({
   triggerImage: React.ReactNode;
   threadId: string;
 }) {
-  const [linkCopied, setLinkCopied] = useState(false);
-  const pathname = typeof window !== "undefined" ? window.location.href : "";
-  const threadLink = `${pathname}thread/${threadId}`;
+  const [linkCopied, setLinkCopied] = useState(false); // State to track if link is copied
+  const [dialogOpen, setDialogOpen] = useState(false); // State to track dialog visibility
+  const pathname = typeof window !== "undefined" ? window.location.href : ""; // Dynamically get the current URL
+  const threadLink = `${pathname}thread/${threadId}`; // Construct the link to the thread
 
-  // Function to handle link copy
+  /**
+   * Function to copy the thread link to clipboard.
+   */
   const handleCopyLink = () => {
     navigator.clipboard
       .writeText(threadLink)
       .then(() => {
-        setLinkCopied(true);
-        setTimeout(() => {
-          setLinkCopied(false); // Reset after 3 seconds
-        }, 3000);
+        setLinkCopied(true); // Indicate that link is copied
+        // Optionally reset linkCopied after a delay
+        // setTimeout(() => setLinkCopied(false), 3000);
       })
       .catch((err) => {
         console.error("Failed to copy:", err);
       });
   };
 
+  /**
+   * Effect to reset linkCopied state when dialog is opened.
+   */
+  useEffect(() => {
+    if (dialogOpen) {
+      setLinkCopied(false); // Reset link copied state
+    }
+  }, [dialogOpen]); // Depend on dialogOpen state
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
       <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white">
         <DialogHeader>

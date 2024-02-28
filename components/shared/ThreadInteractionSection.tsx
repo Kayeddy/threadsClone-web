@@ -4,9 +4,9 @@ import CommentThreadDialog from "../dialogs/CommentThreadDialog";
 import RepostThreadDialog from "../dialogs/RepostThreadDialog";
 import ShareThreadDialog from "../dialogs/ShareThreadDialog";
 import { toggleLikeThread } from "@/lib/actions/thread.actions";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import DeleteThreadDialog from "../dialogs/DeleteThreadDialog";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface Props {
   threadId: string;
@@ -23,6 +23,20 @@ interface Props {
   isComment?: boolean;
 }
 
+/**
+ * Displays interaction options for a thread, including like, comment, repost, share, and delete.
+ *
+ * @param {Object} props Component props
+ * @param {string} props.threadId Unique identifier for the thread.
+ * @param {Object} props.threadAuthor Author of the thread.
+ * @param {string} props.threadContent Content of the thread.
+ * @param {Array} props.threadComments Array of thread comments.
+ * @param {Array} props.threadLikes Array of thread likes.
+ * @param {string | null} props.currentUserId Current user's identifier.
+ * @param {string} [props.currentUserImage] Current user's image URL.
+ * @param {boolean} [props.isComment=false] Flag indicating if the current thread is a comment.
+ * @returns {JSX.Element} The ThreadInteractionSection component.
+ */
 export default function ThreadInteractionSection({
   threadId,
   threadAuthor,
@@ -34,25 +48,27 @@ export default function ThreadInteractionSection({
   isComment = false,
 }: Props) {
   const [threadLiked, setThreadLiked] = useState(false);
-
   const pathname = usePathname();
 
+  /**
+   * Toggles the like status for the thread.
+   */
   const handleThreadLike = async () => {
-    const toggleThreadLikeResult = await toggleLikeThread(
+    const toggleResult = await toggleLikeThread(
       threadId,
-      currentUserId ? currentUserId : "",
+      currentUserId || "",
       pathname
     );
-    setThreadLiked(
-      //@ts-ignore
-      toggleThreadLikeResult.likes.includes(currentUserId ? currentUserId : "")
-    );
+    //@ts-ignore
+    setThreadLiked(toggleResult.likes?.includes(currentUserId || ""));
   };
 
+  // Effect to set initial like status based on threadLikes array.
   useEffect(() => {
-    if (threadLikes && threadLikes.includes(currentUserId ? currentUserId : ""))
-      setThreadLiked(true);
-  }, [threadLikes, threadId]);
+    setThreadLiked(
+      threadLikes?.includes(currentUserId ? currentUserId : "guest") ?? false
+    );
+  }, [threadLikes, currentUserId]);
 
   return (
     <div className="flex gap-3.5">
@@ -60,14 +76,12 @@ export default function ThreadInteractionSection({
         src={
           threadLiked ? "/assets/heart-filled.svg" : "/assets/heart-gray.svg"
         }
-        alt="Thread_Heart_Reaction_Icon"
+        alt="Like"
         width={24}
         height={24}
         className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-        onClick={async () => {
-          await handleThreadLike();
-        }}
-      ></Image>
+        onClick={handleThreadLike}
+      />
 
       {!isComment && (
         <>
@@ -75,47 +89,45 @@ export default function ThreadInteractionSection({
             triggerImage={
               <Image
                 src="/assets/reply.svg"
-                alt="Thread_Reply_Icon"
+                alt="Reply"
                 width={24}
                 height={24}
                 className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-              ></Image>
+              />
             }
             parentThread={{
               id: threadId,
               userId: threadAuthor.id,
               authorName: threadAuthor.name,
               authorImage: threadAuthor.image,
-              content: threadContent ? threadContent : "",
+              content: threadContent || "",
             }}
-            comments={threadComments ? threadComments : []}
+            comments={threadComments || []}
             currentUserId={currentUserId}
             currentUserImage={currentUserImage}
           />
-
           <RepostThreadDialog
             triggerImage={
               <Image
                 src="/assets/repost.svg"
-                alt="Thread_Repost_Icon"
+                alt="Repost"
                 width={24}
                 height={24}
                 className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-              ></Image>
+              />
             }
             currentUserId={currentUserId}
-            threadContent={threadContent ? threadContent : ""}
+            threadContent={threadContent || ""}
           />
-
           <ShareThreadDialog
             triggerImage={
               <Image
                 src="/assets/share.svg"
-                alt="Thread_Share_Icon"
+                alt="Share"
                 width={24}
                 height={24}
                 className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-              ></Image>
+              />
             }
             threadId={threadId}
           />
@@ -127,11 +139,11 @@ export default function ThreadInteractionSection({
           triggerImage={
             <Image
               src="/assets/delete.svg"
-              alt="Thread_Share_Icon"
+              alt="Delete"
               width={16}
               height={16}
               className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-            ></Image>
+            />
           }
           threadId={threadId}
           isComment={isComment}

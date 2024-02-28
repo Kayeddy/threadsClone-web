@@ -14,8 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -23,6 +21,11 @@ interface Props {
   currentUserId: string | null;
   threadContent: string;
 }
+/**
+ * A dialog for confirming the repost of a thread.
+ *
+ * @param {Props} props The component props.
+ */
 export default function RepostThreadDialog({
   triggerImage,
   currentUserId,
@@ -30,67 +33,60 @@ export default function RepostThreadDialog({
 }: Props) {
   const [threadReposted, setThreadReposted] = useState(false);
   const [loadingThreadRepost, setLoadingThreadRepost] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false); // State to track dialog visibility
   const pathname = usePathname();
 
   const handleThreadRepost = async () => {
     setLoadingThreadRepost(true);
     await createThread({
-      threadContent: threadContent,
-      threadAuthor: currentUserId ? currentUserId : "",
+      threadContent,
+      threadAuthor: currentUserId || "",
       threadCommunity: null,
       path: pathname,
     });
-    setThreadReposted(true);
     setLoadingThreadRepost(false);
+    setThreadReposted(true);
   };
 
+  // Effect to reset state when dialog is opened
   useEffect(() => {
-    setLoadingThreadRepost(false);
-    setThreadReposted(false);
-  }, []);
+    if (dialogOpen) {
+      setThreadReposted(false);
+      setLoadingThreadRepost(false);
+    }
+  }, [dialogOpen]);
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
       <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white">
         <DialogHeader>
-          <DialogTitle className="text-light-1">
-            {!threadReposted
-              ? "Repost Thread"
-              : "Thread resposted succesfully!"}
+          <DialogTitle>
+            {threadReposted ? "Thread reposted successfully!" : "Repost Thread"}
           </DialogTitle>
-          {!threadReposted ? (
-            <DialogDescription className="text-light-2">
-              Are you sure you want to repost this Thread on your profile feed?
-            </DialogDescription>
-          ) : (
-            <div className="w-[90%] h-full items-center justify-center">
-              <CheckIcon className="h-14 w-14" />
-            </div>
-          )}
+          <DialogDescription>
+            {threadReposted ? (
+              <CheckIcon className="h-14 w-14 m-auto" />
+            ) : (
+              "Are you sure you want to repost this Thread on your profile feed?"
+            )}
+          </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="sm:justify-start flex flex-row w-full items-center justify-around">
+        <DialogFooter className="flex w-full justify-around">
           <DialogClose asChild>
-            <Button
-              type="button"
-              variant="secondary"
-              className={`${
-                !threadReposted ? "bg-red-300 hover:bg-red-400" : ""
-              } ${loadingThreadRepost && "cursor-not-allowed"}`}
-            >
-              {!threadReposted ? "Cancel" : "Go Back"}
+            <Button variant="secondary" disabled={loadingThreadRepost}>
+              {threadReposted ? "Go Back" : "Cancel"}
             </Button>
           </DialogClose>
-          {!threadReposted ? (
+          {!threadReposted && (
             <Button
-              type="button"
               variant="secondary"
-              onClick={!loadingThreadRepost ? handleThreadRepost : () => {}}
-              className={`${loadingThreadRepost && "cursor-not-allowed"}`}
+              onClick={handleThreadRepost}
+              disabled={loadingThreadRepost}
             >
               Yes, repost
             </Button>
-          ) : null}
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

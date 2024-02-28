@@ -21,9 +21,13 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { createThread } from "@/lib/actions/thread.actions";
 import { useOrganization } from "@clerk/nextjs";
+import { useState } from "react";
 
-//import { updateThread } from "@/lib/actions/user.actions";
-
+/**
+ * Form for posting threads within a community.
+ *
+ * @param {{ userId: string, clerkCommunityId: string }} props The component props.
+ */
 function PostCommunityThreadForm({
   userId,
   clerkCommunityId,
@@ -31,6 +35,8 @@ function PostCommunityThreadForm({
   userId: string;
   clerkCommunityId: string;
 }) {
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to track form submission status
+
   const { startUpload } = useUploadThing("media");
 
   const router = useRouter();
@@ -49,18 +55,27 @@ function PostCommunityThreadForm({
     disabled: enableFormCondition,
   });
 
-  const onSubmit = async (
-    values: zodValidator.infer<typeof ThreadFormValidation>
-  ) => {
-    const threadCommunityId = !organization ? null : organization?.id;
+  /**
+   * Handles form submission, creating a new thread.
+   * Disables the form during submission to prevent duplicate submissions.
+   *
+   * @param {object} values The form values.
+   */
+  const onSubmit = async (values: any) => {
+    setIsSubmitting(true); // Disable submit button
 
-    await createThread({
-      threadContent: values.thread,
-      threadAuthor: userId,
-      threadCommunity: threadCommunityId,
-      path: pathname,
-      likes: [],
-    });
+    try {
+      await createThread({
+        threadContent: values.thread,
+        threadAuthor: userId,
+        threadCommunity: organization?.id || null,
+        path: pathname,
+      });
+
+      router.push("/"); // Navigate away after successful submission
+    } finally {
+      setIsSubmitting(false); // Re-enable submit button
+    }
   };
 
   return (
@@ -94,10 +109,10 @@ function PostCommunityThreadForm({
 
           <Button
             type="submit"
-            disabled={enableFormCondition}
+            disabled={enableFormCondition || isSubmitting}
             className="bg-primary-500 w-[150px]"
           >
-            Post new Thread
+            {isSubmitting ? "Posting..." : "Post new Thread"}
           </Button>
         </form>
       </Form>

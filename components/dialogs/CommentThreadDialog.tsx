@@ -1,6 +1,5 @@
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -8,9 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { fetchAllComments } from "@/lib/actions/thread.actions";
 import DynamicCommentsTab from "../tabs/DynamicCommentsTab";
 import Image from "next/image";
 import ThreadCommentForm from "../forms/ThreadCommentForm";
@@ -30,6 +26,12 @@ interface Props {
   currentUserImage: string | undefined;
 }
 
+/**
+ * Displays a dialog containing a thread of comments.
+ *
+ * @param {Props} props - The properties passed to the component.
+ * @returns {JSX.Element} A dialog component populated with thread and comments data.
+ */
 export default function CommentThreadDialog({
   triggerImage,
   parentThread,
@@ -37,43 +39,44 @@ export default function CommentThreadDialog({
   currentUserId,
   currentUserImage,
 }: Props) {
+  // Profile link - navigates to current user's profile if the thread is by them, otherwise to the thread author's profile.
+  const profileLink =
+    currentUserId === parentThread.userId
+      ? "/profile"
+      : `/profile/${parentThread.userId}`;
+
   return (
     <Dialog>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
       <DialogContent className="max-w-[90vw] h-fit max-h-[570px] sm:max-w-xl bg-dark-3 text-white overflow-hidden flex flex-col">
-        <DialogHeader className="flex flex-col">
-          <DialogTitle className="text-light-1 flex flex-col items-start w-full">
+        <DialogHeader>
+          <DialogTitle className="flex flex-col items-start w-full">
             <Link
-              href={`${
-                currentUserId === parentThread.userId
-                  ? "/profile"
-                  : `/profile/${parentThread.userId}`
-              }`}
-              className="relative h-10 w-fit hover:scale-110 transition-all duration-300 ease-in-out  flex flex-row items-center justify-start gap-4"
+              href={profileLink}
+              className="relative h-10 w-fit hover:scale-110 transition-all duration-300 ease-in-out flex flex-row items-center justify-start gap-4"
             >
               <Image
                 src={parentThread.authorImage}
-                alt="Thread_author_image"
+                alt="Author profile image"
                 width={24}
                 height={24}
-                className="cursor-pointer object-contain "
-              ></Image>
-
-              <span className="text-base-semibold text-light-1">
+                className="cursor-pointer object-contain"
+              />
+              <span className="text-base-semibold">
                 {currentUserId === parentThread.userId
                   ? "You"
                   : parentThread.authorName}
               </span>
             </Link>
-            <span className="mt-2 text-base-regular text-light-2 whitespace-pre-line break-all">
+            <span className="mt-2 text-base-regular whitespace-pre-line break-all">
               {parentThread.content}
             </span>
           </DialogTitle>
-          <DialogDescription className="text-light-2 custom-scrollbar overflow-y-scroll h-[350px] py-4 transition-all duration-200 ease-in-out">
+          <DialogDescription className="custom-scrollbar overflow-y-scroll h-[350px] py-4">
             {comments.length > 0 ? (
               <DynamicCommentsTab
                 commentsList={comments}
-                currentUserId={currentUserId ? currentUserId : ""}
+                currentUserId={currentUserId || ""}
                 parentThreadId={parentThread.id}
               />
             ) : (
@@ -81,12 +84,11 @@ export default function CommentThreadDialog({
             )}
           </DialogDescription>
         </DialogHeader>
-
-        <DialogFooter className="sm:justify-start">
+        <DialogFooter>
           <ThreadCommentForm
             threadId={parentThread.id}
             currentLoggedInUserImage={currentUserImage}
-            userId={currentUserId ? currentUserId : ""}
+            userId={currentUserId || ""}
           />
         </DialogFooter>
       </DialogContent>

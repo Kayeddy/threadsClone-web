@@ -2,7 +2,6 @@ import ThreadCard from "@/components/cards/ThreadCard";
 
 interface Props {
   currentLoggedInUserId: string;
-  accessedAccountId: string;
   accessedAccountImage: string;
   accountThreads: any[];
   accountType: string;
@@ -12,7 +11,6 @@ interface Props {
 export default async function ThreadsTab({
   currentLoggedInUserId,
   accessedAccountImage,
-  accessedAccountId,
   accountThreads,
   accountType,
   renderCardInteractions,
@@ -22,7 +20,7 @@ export default async function ThreadsTab({
       {accountThreads.length ? (
         accountThreads.map((thread: any) => {
           const threadCardProps = {
-            threadId: thread._id,
+            threadId: thread._id.toString(),
             currentUserId: currentLoggedInUserId,
             parentId: thread.parentId ? thread.parentId.toString() : null,
             threadContent: thread.threadContent,

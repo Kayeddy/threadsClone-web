@@ -1,5 +1,5 @@
 "use client";
-import { createThread, deleteThread } from "@/lib/actions/thread.actions";
+import { deleteThread } from "@/lib/actions/thread.actions";
 import { usePathname } from "next/navigation";
 import { CheckIcon } from "@radix-ui/react-icons";
 
@@ -14,9 +14,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+
+import { useState, useEffect } from "react";
 
 interface Props {
   triggerImage: React.ReactNode;
@@ -24,6 +23,11 @@ interface Props {
   isComment?: boolean;
 }
 
+/**
+ * A dialog for confirming the deletion of a thread or comment.
+ *
+ * @param {Props} props The component props.
+ */
 export default function DeleteThreadDialog({
   triggerImage,
   threadId,
@@ -31,66 +35,61 @@ export default function DeleteThreadDialog({
 }: Props) {
   const [threadDeleted, setThreadDeleted] = useState(false);
   const [loadingThreadDeletion, setLoadingThreadDeletion] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false); // Track dialog visibility
   const pathname = usePathname();
 
+  /**
+   * Handles the deletion of the thread or comment.
+   */
   const handleThreadDeletion = async () => {
     setLoadingThreadDeletion(true);
-    const deleteThreadResponse = await deleteThread(threadId, pathname);
+    await deleteThread(threadId, pathname);
     setLoadingThreadDeletion(false);
     setThreadDeleted(true);
   };
 
-  const handleDialogReset = () => {
-    setThreadDeleted(false);
-    setLoadingThreadDeletion(false);
-  };
+  // Effect to reset state when dialog is opened
+  useEffect(() => {
+    if (dialogOpen) {
+      setThreadDeleted(false);
+      setLoadingThreadDeletion(false);
+    }
+  }, [dialogOpen]);
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
       <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white">
         <DialogHeader>
-          <DialogTitle className="text-light-1">
-            {!threadDeleted ? "Delete Thread" : "Thread deleted succesfully"}
+          <DialogTitle>
+            {threadDeleted ? "Thread deleted successfully" : "Delete Thread"}
           </DialogTitle>
-          {!threadDeleted ? (
-            <DialogDescription className="text-light-2">
-              {`Are you sure you want to delete this ${
-                isComment ? "comment" : "Thread"
-              }? This action cannot be
-              undone.`}
-            </DialogDescription>
-          ) : (
-            <div className="w-[90%] h-full items-center justify-center">
-              <CheckIcon className="h-14 w-14" />
-            </div>
-          )}
-        </DialogHeader>
-        <DialogFooter className="sm:justify-start flex flex-row w-full items-center justify-around">
-          <DialogClose asChild>
-            {!loadingThreadDeletion && (
-              <Button
-                type="button"
-                variant="secondary"
-                className={` ${loadingThreadDeletion && "cursor-not-allowed"}`}
-                onClick={handleDialogReset}
-              >
-                {`${!threadDeleted ? "Cancel" : "Go back"}`}
-              </Button>
+          <DialogDescription>
+            {threadDeleted ? (
+              <CheckIcon className="h-14 w-14 m-auto" />
+            ) : (
+              `Are you sure you want to delete this ${
+                isComment ? "comment" : "thread"
+              }? This action cannot be undone.`
             )}
-          </DialogClose>
-          {!threadDeleted ? (
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={!loadingThreadDeletion ? handleThreadDeletion : () => {}}
-              className={`bg-red-300 hover:bg-red-400 ${
-                loadingThreadDeletion && "cursor-not-allowed"
-              }`}
-            >
-              {`Delete ${isComment ? "comment" : "Thread"}`}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex w-full justify-around">
+          <DialogClose asChild>
+            <Button variant="secondary" disabled={loadingThreadDeletion}>
+              {threadDeleted ? "Go back" : "Cancel"}
             </Button>
-          ) : null}
+          </DialogClose>
+          {!threadDeleted && (
+            <Button
+              variant="secondary"
+              className="hover:bg-red-300"
+              onClick={handleThreadDeletion}
+              disabled={loadingThreadDeletion}
+            >
+              Delete {isComment ? "comment" : "Thread"}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

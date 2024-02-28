@@ -10,15 +10,21 @@ interface Props {
   name: string;
   username: string;
   userProfileImage: string;
-  personType: string;
+  personType?: string;
 }
+
+/**
+ * UserCard Component - Displays a user's profile information card.
+ *
+ * @param {Props} props - The props passed to the UserCard component.
+ * @returns {JSX.Element} The UserCard component.
+ */
 export default function UserCard({
   userId,
   currentUserId,
   name,
   username,
   userProfileImage,
-  personType,
 }: Props) {
   const router = useRouter();
 

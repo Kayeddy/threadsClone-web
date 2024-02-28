@@ -1,6 +1,11 @@
-import Image from "next/image";
-import { Button } from "../ui/button";
-
+/**
+ * Represents a card component that displays information about an invited user.
+ *
+ * @param {Object} props The props object.
+ * @param {string} props.invitedUserEmail The email address of the invited user.
+ * @param {string} props.invitedUserStatus The current status of the user's invitation (e.g., 'pending', 'accepted').
+ * @returns {JSX.Element} The InvitedUserCard component.
+ */
 export default function InvitedUserCard({
   invitedUserEmail,
   invitedUserStatus,

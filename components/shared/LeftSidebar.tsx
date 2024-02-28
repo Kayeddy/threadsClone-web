@@ -2,23 +2,30 @@
 
 import { sidebarLinks } from "@/constants";
 import { SignOutButton, SignedIn } from "@clerk/nextjs";
-import { useOrganization } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+/**
+ * Renders the left sidebar with navigation links and sign-out functionality.
+ *
+ * Uses Next.js navigation hooks for routing and conditionally applies styling
+ * based on the current route to highlight active links. Includes a sign-out button
+ * with a callback to redirect to the sign-in page upon successful sign-out.
+ */
 export default function LeftSidebar() {
   const router = useRouter();
   const pathname = usePathname();
-  const orgDetails = useOrganization();
 
   return (
     <section className="custom-scrollbar left-sidebar">
       <div className="flex w-full flex-1 flex-col gap-6 px-6">
         {sidebarLinks.map((link) => {
+          // Determine if the current link is active based on the pathname
           const isActive =
-            (pathname === link.route && link.route.length > 1) ||
-            pathname === link.route;
+            pathname === link.route ||
+            (pathname.includes(link.route) && link.route.length > 1);
+
           return (
             <Link
               href={link.route}
@@ -28,14 +35,17 @@ export default function LeftSidebar() {
                   ? "bg-primary-500"
                   : "hover:bg-primary-500 hover:bg-opacity-40"
               }`}
+              passHref
             >
-              <Image
-                src={link.imgURL}
-                alt={link.label}
-                width={24}
-                height={24}
-              />
-              <p className="text-light-1 max-lg:hidden"> {link.label} </p>
+              <div className="flex items-center gap-2 cursor-pointer">
+                <Image
+                  src={link.imgURL}
+                  alt={link.label}
+                  width={24}
+                  height={24}
+                />
+                <p className="text-light-1 max-lg:hidden">{link.label}</p>
+              </div>
             </Link>
           );
         })}

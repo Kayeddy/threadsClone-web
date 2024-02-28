@@ -24,8 +24,12 @@ import { createThread } from "@/lib/actions/thread.actions";
 import { useOrganization } from "@clerk/nextjs";
 import { useState } from "react";
 
-//import { updateThread } from "@/lib/actions/user.actions";
-
+/**
+ * Form component for posting a new thread.
+ *
+ * @param {object} props Component props
+ * @param {string} props.userId Current user's ID
+ */
 function PostThreadForm({ userId }: { userId: string }) {
   const [postingThread, setPostingThread] = useState(false);
   const { startUpload } = useUploadThing("media");
@@ -42,20 +46,28 @@ function PostThreadForm({ userId }: { userId: string }) {
     }, // Default values for fields within the form
   });
 
-  const onSubmit = async (
-    values: zodValidator.infer<typeof ThreadFormValidation>
-  ) => {
-    setPostingThread(true);
-    const threadCommunityId = !organization ? null : organization?.id;
-
-    await createThread({
-      threadContent: values.thread,
-      threadAuthor: userId,
-      threadCommunity: null,
-      path: pathname,
-      likes: [],
-    });
-    router.push("/");
+  /**
+   * Handles the form submission.
+   *
+   * @param {object} values Form values
+   */
+  const onSubmit = async (values: any) => {
+    setPostingThread(true); // Block button to prevent multiple submissions
+    try {
+      const threadCommunityId = organization?.id || null;
+      await createThread({
+        threadContent: values.thread,
+        threadAuthor: userId,
+        threadCommunity: threadCommunityId,
+        path: pathname,
+        likes: [],
+      });
+    } catch (error) {
+      console.error("Failed to post thread:", error);
+    } finally {
+      router.push("/"); // Navigate to home after successful thread creation
+      setPostingThread(false); // Unblock button after process is completed
+    }
   };
 
   return (

@@ -1,41 +1,46 @@
 "use client";
 import { sidebarLinks } from "@/constants";
-import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
+/**
+ * Renders the bottom navigation bar with dynamic links. Highlights the current active link.
+ * Utilizes the updated Next.js `Link` component structure for navigation.
+ *
+ * @returns {JSX.Element} The component for the bottom navigation bar.
+ */
 export default function BottomBar() {
-  const router = useRouter();
   const pathname = usePathname();
 
+  // Function to check if a link is active based on the current pathname
+  const isActiveLink = (route: string) => {
+    return (pathname.includes(route) && route.length > 1) || pathname === route;
+  };
+
   return (
-    <section className="bottom-bar">
+    <nav className="bottom-bar">
       <div className="bottom-bar_container">
         {sidebarLinks.map((link) => {
-          const isActive =
-            (pathname.includes(link.route) && link.route.length > 1) ||
-            pathname === link.route;
+          const isActive = isActiveLink(link.route);
+          // Adjusted to use only the Link component for navigation without <a> tags
           return (
-            <Link
-              href={link.route}
-              key={link.label}
-              className={`bottom-bar_link transition-all duration-150 ease-in-out ${
-                isActive && "bg-primary-500"
-              }`}
-            >
-              <Image
-                src={link.imgURL}
-                alt={link.label}
-                width={20}
-                height={20}
-              />
-              <p className="text-subtle-medium text-light-1 max-sm:hidden">
-                {link.label.split(/\s+./)[0]}
-              </p>
+            <Link href={link.route} key={link.label}>
+              <div className={`bottom-bar_link ${isActive ? "active" : ""}`}>
+                {/* Using span to indirectly include image and text within Link */}
+                <img
+                  src={link.imgURL}
+                  alt={link.label}
+                  width={20}
+                  height={20}
+                />
+                <p className="text-subtle-medium text-light-1 max-sm:hidden">
+                  {link.label}
+                </p>
+              </div>
             </Link>
           );
         })}
       </div>
-    </section>
+    </nav>
   );
 }

@@ -4,26 +4,31 @@ interface Props {
   accessedAccountUserId: string;
   currentLoggedInUserId: string;
   accessedAccountName: string;
-  accessedAcountUsername: string;
-  accessedAcountProfileImage: string;
+  accessedAccountUsername: string;
+  accessedAccountProfileImage: string;
   accessedAccountBio: string;
   type?: string;
 }
 
+/**
+ * Displays the header for an account profile including the profile image,
+ * account name, username, and bio.
+ * @param {Props} props The props for this component.
+ */
 export default function AccountProfileHeader({
   accessedAccountName,
-  accessedAcountUsername,
-  accessedAcountProfileImage,
+  accessedAccountUsername,
+  accessedAccountProfileImage,
   accessedAccountBio,
 }: Props) {
   return (
-    <div className="flex w-ffull flex-col justify-start">
+    <div className="flex w-full flex-col justify-start">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative h-20 w-20 object-cover">
             <Image
-              src={accessedAcountProfileImage}
-              alt="Account_Profile-Image"
+              src={accessedAccountProfileImage}
+              alt={`${accessedAccountName}'s profile image`}
               fill
               className="rounded-full object-cover shadow-2xl"
             />
@@ -33,7 +38,7 @@ export default function AccountProfileHeader({
               {accessedAccountName}
             </h2>
             <p className="text-base-medium text-gray-1">
-              @{accessedAcountUsername}
+              @{accessedAccountUsername}
             </p>
           </div>
         </div>
