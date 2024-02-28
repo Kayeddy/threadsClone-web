@@ -29,7 +29,7 @@ interface ThreadCardProps {
       name: string;
       image: string;
     };
-    threadLikes: string[];
+    likes: string[];
     createdAt: Date;
   }[];
   threadLikes?: string[];
@@ -218,7 +218,7 @@ export default function ThreadCard({
         name: comment.threadAuthor.name,
         image: comment.threadAuthor.image,
       },
-      threadLikes: comment.threadLikes.map((like) => {
+      threadLikes: comment.likes.map((like) => {
         return like.toString();
       }),
       createdAt: comment.createdAt,
@@ -227,7 +227,7 @@ export default function ThreadCard({
 
   return (
     <article
-      className={`thread-card  ${isComment ? "px-0 xs:px-7" : "bg-dark-2"}`}
+      className={`thread-card bg-glassmorphism  ${isComment && "px-0 xs:px-7"}`}
     >
       <div className="flex items-start justify-between">
         <div className="flex w-full flex-1 flex-row gap-4">

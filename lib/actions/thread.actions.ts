@@ -231,19 +231,16 @@ export async function commentThread({
 export async function fetchAllComments(threadId: string): Promise<any[]> {
   await connectToDB();
   try {
-    const commentsList = await Thread.find({ parentId: threadId });
-    let descendantThreads = [];
+    // Directly fetching comments that are first-level replies to the specified threadId
+    const commentsList = await Thread.find({ parentId: threadId })
+      .populate({
+        path: "threadAuthor",
+        select: "name image userId",
+      })
+      .select("threadContent parentId") // Include threadContent and parentId in the selection
+      .exec(); // Execute the query
 
-    // Use parallel promises to fetch descendants to improve performance
-    const descendantPromises = commentsList.map(async (comment) => {
-      const descendants = await fetchAllComments(comment._id);
-      return [comment, ...descendants];
-    });
-
-    // Await all recursive calls to complete and flatten the results
-    descendantThreads = (await Promise.all(descendantPromises)).flat();
-
-    return descendantThreads;
+    return commentsList; // Directly return the list of first-level comments without further processing
   } catch (error) {
     console.error(
       `Error fetching all comments for thread ${threadId}: ${error}`

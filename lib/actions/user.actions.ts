@@ -250,14 +250,24 @@ export async function fetchProfileThreads(userId: string) {
 
   try {
     // Directly fetching threads authored by the user to streamline the query
-    const threads = await Thread.find({ threadAuthor: userId })
+    const threads = await Thread.find({
+      threadAuthor: userId,
+      $or: [
+        { parentId: { $exists: false } },
+        { parentId: "" },
+        { parentId: null },
+      ],
+    })
       .populate({
         path: "threadCommunity",
         select: "name id image", // Assuming 'id' is needed, though '_id' is automatically included
       })
       .populate({
         path: "children",
-        populate: { path: "threadAuthor", select: "name image userId" },
+        populate: {
+          path: "threadAuthor",
+          select: "name username image userId",
+        },
       });
 
     if (!threads) {
@@ -274,6 +284,13 @@ export async function fetchProfileThreads(userId: string) {
     );
   }
 }
+
+/**
+ * Fetches replies (children) of threads created by a specific user.
+ *
+ * @param userId - The ID of the user whose thread replies are being fetched.
+ * @returns A promise resolving to the replies of the user's threads.
+ */
 
 /**
  * Fetches all the communities a user is part of.

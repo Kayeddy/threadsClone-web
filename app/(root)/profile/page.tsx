@@ -1,6 +1,8 @@
 import UserProfileHeader from "@/components/shared/AccountProfileHeader";
 import AccountProfileTabs from "@/components/shared/AccountProfileTabs";
+import ProfileRepliesTab from "@/components/tabs/ProfileRepliesTab";
 import { profileTabs } from "@/constants";
+import { fetchAllComments } from "@/lib/actions/thread.actions";
 import { fetchProfileThreads, fetchUserData } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
@@ -27,6 +29,9 @@ export default async function UserProfile() {
     const fetchedThreads = await fetchProfileThreads(
       currentLoggedInUserData._id
     );
+
+    //const comments = await fetchAllComments("65deb60cce32e20b03bd304a");
+    //console.log(fetchedThreads);
 
     const profileHeaderProps = {
       accessedAccountUserId: currentLoggedInUserData.userId,

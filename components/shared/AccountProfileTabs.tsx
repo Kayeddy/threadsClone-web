@@ -4,6 +4,7 @@ import ThreadsTab from "../tabs/ThreadsTab";
 import MembersTab from "../tabs/MembersTab";
 import PostCommunityThreadForm from "../forms/PostCommunityThreadForm";
 import CommunityInvitationsTab from "../tabs/CommunityInvitationsTab";
+import ProfileRepliesTab from "../tabs/ProfileRepliesTab";
 
 interface Props {
   userId: string;
@@ -104,7 +105,13 @@ export default function AccountProfileTabs({
               />
             </div>
           )}
-          {tab.value === "replies" && null}
+          {tab.value === "replies" && (
+            <ProfileRepliesTab
+              accountThreads={accountThreads}
+              currentLoggedInUserId={userId}
+            />
+          )}
+
           {tab.value === "tagged" && null}
           {tab.value === "members" && (
             <MembersTab
