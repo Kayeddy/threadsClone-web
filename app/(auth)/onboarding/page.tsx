@@ -16,9 +16,9 @@ async function page() {
     image: "",
   };
   const currentUserCompleteData = {
-    userId: loggedInUser?.id || "", //change this after,
-    objectId: currentUserPartialData?._id || "", //change this after,
-    username: currentUserPartialData?.username || loggedInUser?.username || "", //change this after,
+    userId: loggedInUser?.id || "",
+    objectId: currentUserPartialData?._id || "",
+    username: currentUserPartialData?.username || loggedInUser?.username || "",
     name: currentUserPartialData?.name || loggedInUser?.firstName || "",
     bio: currentUserPartialData?.bio || "",
     image: currentUserPartialData?.image || loggedInUser?.imageUrl || "",
