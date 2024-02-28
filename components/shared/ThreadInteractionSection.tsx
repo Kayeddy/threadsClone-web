@@ -7,6 +7,9 @@ import { toggleLikeThread } from "@/lib/actions/thread.actions";
 import { useState, useEffect } from "react";
 import DeleteThreadDialog from "../dialogs/DeleteThreadDialog";
 import { usePathname } from "next/navigation";
+import { Tooltip } from "@nextui-org/tooltip";
+import { tooltipVariants } from "@/config/motion";
+import { AnimatedTooltip } from "./AnimatedTooltip";
 
 interface Props {
   threadId: string;
@@ -71,83 +74,94 @@ export default function ThreadInteractionSection({
   }, [threadLikes, currentUserId]);
 
   return (
-    <div className="flex gap-3.5">
-      <Image
-        src={
-          threadLiked ? "/assets/heart-filled.svg" : "/assets/heart-gray.svg"
-        }
-        alt="Like"
-        width={24}
-        height={24}
-        className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-        onClick={handleThreadLike}
-      />
-
+    <div className="flex flex-row items-center gap-6">
+      <AnimatedTooltip tooltipText="Like">
+        <Image
+          src={
+            threadLiked ? "/assets/heart-filled.svg" : "/assets/heart-gray.svg"
+          }
+          alt="Like"
+          width={24}
+          height={24}
+          className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+          onClick={handleThreadLike}
+        />
+      </AnimatedTooltip>
       {!isComment && (
         <>
-          <CommentThreadDialog
-            triggerImage={
-              <Image
-                src="/assets/reply.svg"
-                alt="Reply"
-                width={24}
-                height={24}
-                className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-              />
-            }
-            parentThread={{
-              id: threadId,
-              userId: threadAuthor.id,
-              authorName: threadAuthor.name,
-              authorImage: threadAuthor.image,
-              content: threadContent || "",
-            }}
-            comments={threadComments || []}
-            currentUserId={currentUserId}
-            currentUserImage={currentUserImage}
-          />
-          <RepostThreadDialog
-            triggerImage={
-              <Image
-                src="/assets/repost.svg"
-                alt="Repost"
-                width={24}
-                height={24}
-                className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-              />
-            }
-            currentUserId={currentUserId}
-            threadContent={threadContent || ""}
-          />
-          <ShareThreadDialog
-            triggerImage={
-              <Image
-                src="/assets/share.svg"
-                alt="Share"
-                width={24}
-                height={24}
-                className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-              />
-            }
-            threadId={threadId}
-          />
+          <AnimatedTooltip tooltipText="Comment">
+            <CommentThreadDialog
+              triggerImage={
+                <Image
+                  src="/assets/reply.svg"
+                  alt="Reply"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                />
+              }
+              parentThread={{
+                id: threadId,
+                userId: threadAuthor.id,
+                authorName: threadAuthor.name,
+                authorImage: threadAuthor.image,
+                content: threadContent || "",
+              }}
+              comments={threadComments || []}
+              currentUserId={currentUserId}
+              currentUserImage={currentUserImage}
+            />
+          </AnimatedTooltip>
+
+          <AnimatedTooltip tooltipText="Repost">
+            <RepostThreadDialog
+              triggerImage={
+                <Image
+                  src="/assets/repost.svg"
+                  alt="Repost"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                />
+              }
+              currentUserId={currentUserId}
+              threadContent={threadContent || ""}
+            />
+          </AnimatedTooltip>
+
+          <AnimatedTooltip tooltipText="Share">
+            <ShareThreadDialog
+              triggerImage={
+                <Image
+                  src="/assets/share.svg"
+                  alt="Share"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+                />
+              }
+              threadId={threadId}
+            />
+          </AnimatedTooltip>
         </>
       )}
 
       {currentUserId === threadAuthor.id && (
-        <DeleteThreadDialog
-          triggerImage={
-            <Image
-              src="/assets/delete.svg"
-              alt="Delete"
-              width={16}
-              height={16}
-              className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
-            />
-          }
-          threadId={threadId}
-          isComment={isComment}
-        />
+        <AnimatedTooltip tooltipText="Delete">
+          <DeleteThreadDialog
+            triggerImage={
+              <Image
+                src="/assets/delete.svg"
+                alt="Delete"
+                width={16}
+                height={16}
+                className="cursor-pointer object-contain hover:scale-110 transition-all duration-300 ease-in-out hover:brightness-200"
+              />
+            }
+            threadId={threadId}
+            isComment={isComment}
+          />
+        </AnimatedTooltip>
       )}
     </div>
   );
