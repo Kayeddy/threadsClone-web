@@ -30,6 +30,7 @@ interface ThreadCardProps {
       image: string;
     };
     threadLikes: string[];
+    createdAt: Date;
   }[];
   threadLikes?: string[];
   isComment?: boolean; // Not required
@@ -195,7 +196,6 @@ export default function ThreadCard({
   threadId,
   currentUserId,
   currentUserImage,
-  parentId,
   threadContent,
   threadAuthor,
   threadCommunity,
@@ -218,11 +218,9 @@ export default function ThreadCard({
         name: comment.threadAuthor.name,
         image: comment.threadAuthor.image,
       },
-      //@ts-ignore
-      threadLikes: comment.likes.map((like) => {
+      threadLikes: comment.threadLikes.map((like) => {
         return like.toString();
       }),
-      //@ts-ignore
       createdAt: comment.createdAt,
     }));
   }
