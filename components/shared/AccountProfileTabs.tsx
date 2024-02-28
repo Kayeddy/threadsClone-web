@@ -97,7 +97,6 @@ export default function AccountProfileTabs({
               )}
               <ThreadsTab
                 currentLoggedInUserId={userId}
-                accessedAccountId={accountId}
                 accessedAccountImage={accountImage}
                 accountThreads={accountThreads}
                 accountType={accountType}
