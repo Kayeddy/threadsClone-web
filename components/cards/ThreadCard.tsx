@@ -224,6 +224,7 @@ export default function ThreadCard({
       createdAt: comment.createdAt,
     }));
   }
+
   return (
     <article
       className={`thread-card  ${isComment ? "px-0 xs:px-7" : "bg-dark-2"}`}
