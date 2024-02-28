@@ -138,11 +138,7 @@ const AccountProfileForm = ({ currentUserData }: Props) => {
     });
 
     setIsSubmitting(false); // Re-enable the submit button after processing
-    if (pathname === "/profile/edit") {
-      router.back();
-    } else {
-      router.push("/");
-    }
+    router.push("/");
   };
 
   return (
