@@ -75,6 +75,7 @@ export default function CommentThreadDialog({
           <DialogDescription className="custom-scrollbar overflow-y-scroll h-[350px] py-4">
             {comments.length > 0 ? (
               <DynamicCommentsTab
+                //@ts-ignore
                 commentsList={comments}
                 currentUserId={currentUserId || ""}
                 parentThreadId={parentThread.id}
