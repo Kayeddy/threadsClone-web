@@ -10,7 +10,7 @@ import ProfileTaggedTab from "../tabs/ProfileTaggedTab";
 interface Props {
   userId: string;
   accountThreads: [] | any;
-  accountTags: [] | any;
+  accountTags?: [] | any;
   accountId: string;
   accountImage: string;
   tabList: any[];
