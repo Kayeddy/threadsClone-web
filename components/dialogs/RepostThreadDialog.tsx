@@ -42,6 +42,7 @@ export default function RepostThreadDialog({
       threadContent,
       threadAuthor: currentUserId || "",
       threadCommunity: null,
+      tags: null,
       path: pathname,
     });
     setLoadingThreadRepost(false);
