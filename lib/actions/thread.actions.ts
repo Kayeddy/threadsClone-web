@@ -12,6 +12,7 @@ interface ThreadCreationParams {
   threadAuthor: string;
   threadCommunity: string | null;
   likes?: string[] | null;
+  tags: string[] | null;
   path: string;
 }
 
@@ -32,6 +33,7 @@ export async function createThread({
   threadContent,
   threadAuthor,
   threadCommunity,
+  tags,
   path,
 }: ThreadCreationParams) {
   try {
@@ -45,7 +47,8 @@ export async function createThread({
     const createdThread = await Thread.create({
       threadContent,
       threadAuthor,
-      threadCommunity: communityIdObject, // Assign communityId if provided, or leave it null for personal account
+      threadCommunity: communityIdObject,
+      tags,
     });
 
     console.log("Created Thread details in thread actions", createdThread);
@@ -64,7 +67,7 @@ export async function createThread({
 
     revalidatePath(path);
 
-    return createdThread; // Return the created thread for confirmation or further processing
+    return createdThread.toObject(); // Return the created thread for confirmation or further processing
   } catch (error) {
     console.error(`Error creating thread: ${error}`);
     throw new Error(`Could not create thread. Error details: ${error}`);
@@ -337,26 +340,32 @@ export async function deleteThread(
 
   try {
     // Ensure the thread exists before proceeding
-    const threadToDelete = await Thread.findByIdAndDelete(threadId);
+    const threadToDelete = await Thread.findById(threadId);
     if (!threadToDelete) {
       throw new Error("Thread to delete not found");
     }
 
-    // Update the User model
+    // Delete the thread
+    await Thread.findByIdAndDelete(threadId);
+
+    // Update User model to remove the thread from the threads array
     await User.updateMany(
-      { threads: threadToDelete._id },
-      { $pull: { threads: threadToDelete._id } }
+      { threads: threadId },
+      { $pull: { threads: threadId } }
     );
+
+    // Update User model to remove the thread from the tagged array
+    await User.updateMany({}, { $pull: { tagged: { thread: threadId } } });
 
     // Update the Community model
     await Community.updateMany(
-      { threads: threadToDelete._id },
-      { $pull: { threads: threadToDelete._id } }
+      { threads: threadId },
+      { $pull: { threads: threadId } }
     );
 
     // Invoke the revalidatePath function
     if (typeof revalidatePath === "function") {
-      revalidatePath(path);
+      await revalidatePath(path);
     }
   } catch (error) {
     console.error(`Error deleting thread: ${error}`);

@@ -1,5 +1,6 @@
 import PostThreadForm from "@/components/forms/PostThreadForm";
 import { fetchUserData } from "@/lib/actions/user.actions";
+import { fetchUserTags } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
@@ -21,6 +22,8 @@ async function Page() {
 
     const currentLoggedInUserData = await fetchUserData(currentLoggedInUser.id);
 
+    const userTags = await fetchUserTags(currentLoggedInUserData._id);
+
     // Redirect users who haven't completed onboarding
     if (!currentLoggedInUserData?.onboarded) {
       redirect("/onboarding");
@@ -30,7 +33,11 @@ async function Page() {
     return (
       <>
         <h1 className="head-text">Create Thread</h1>
-        <PostThreadForm userId={currentLoggedInUserData._id.toString()} />
+        <PostThreadForm
+          userId={currentLoggedInUserData._id.toString()}
+          //@ts-ignore
+          retrievedUserTags={userTags.flat()}
+        />
       </>
     );
   } catch (error) {

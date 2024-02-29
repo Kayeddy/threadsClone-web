@@ -84,6 +84,33 @@ export async function fetchAllUsers({
 }
 
 /**
+ * Fetches usernames of all users, excluding the current user.
+ *
+ * @param {string} currentUserId The ID of the current user to exclude.
+ * @returns An array of usernames.
+ */
+export async function fetchUserTags(userId: string) {
+  await connectToDB();
+
+  try {
+    // Execute the query to fetch usernames and their IDs, excluding the current user
+    const userTags = await User.find(
+      { _id: { $ne: userId } },
+      "_id username image"
+    );
+
+    return userTags; // This will return an array of objects, each containing a user's _id and username
+  } catch (error) {
+    console.error(`Error fetching user tags: ${error}`);
+    throw new Error(
+      `Failed to fetch user tags from database. Error details: ${error}`
+    );
+  }
+}
+
+export async function fetchUserTagsData() {}
+
+/**
  * Fetches data for a specific user, including the communities they are part of.
  *
  * @param userId - The unique identifier of the user whose data is being fetched.
@@ -93,10 +120,21 @@ export async function fetchUserData(userId: string) {
   connectToDB();
 
   try {
-    const user = await User.findOne({ userId: userId }).populate({
-      path: "communities",
-      model: Community,
-    });
+    const user = await User.findOne({ userId: userId })
+      .populate({
+        path: "communities",
+        model: Community,
+      })
+      .populate({
+        path: "tagged.thread",
+        model: "Thread",
+        select: "_id threadContent",
+      })
+      .populate({
+        path: "tagged.taggedBy",
+        model: "User",
+        select: "name username image", // Optionally limit the fields to return
+      });
 
     if (!user) {
       return null;
@@ -202,6 +240,58 @@ export async function updateUser({
 }
 
 /**
+ * Updates user documents to add tagging information for a given thread.
+ * This function is used when a user tags other users in a thread, updating
+ * each tagged user's document with details about the thread they were tagged in.
+ *
+ * @param {Object} params - The parameters for updating user tags.
+ * @param {string} params.userId - The ID of the user who created the thread or performed the tagging.
+ * @param {string[] | null} params.tags - An array of user IDs that were tagged in the thread. If no users were tagged, this can be null.
+ * @param {string} params.threadId - The ID of the thread in which users were tagged.
+ * @param {string} params.threadContent - The content of the thread in which users were tagged. This is used to provide context in the tagging.
+ * @returns {Promise<void>} A promise that resolves once all updates are complete. Does not return any value.
+ */
+export async function updateUserTags({
+  userId,
+  tags,
+  threadId,
+  threadContent,
+}: {
+  userId: string;
+  tags: string[] | null;
+  threadId: string;
+  threadContent: string;
+}): Promise<void> {
+  // Map tags to promises
+  if (tags && tags.length > 0) {
+    User.findByIdAndUpdate(userId, {
+      $push: {
+        tagged: {
+          thread: threadId,
+          taggedBy: userId,
+          threadContent: threadContent,
+        },
+      },
+    });
+
+    const updatePromises = tags.map((taggedUserId) =>
+      User.findByIdAndUpdate(taggedUserId, {
+        $push: {
+          tagged: {
+            thread: threadId,
+            taggedBy: userId,
+            threadContent: threadContent,
+          },
+        },
+      })
+    );
+
+    // Wait for all updates to complete
+    await Promise.all(updatePromises);
+  }
+}
+
+/**
  * Adds a newly created thread to the user's list of threads.
  *
  * @param {Object} params - Parameters including the userId and the createdThread.
@@ -260,7 +350,7 @@ export async function fetchProfileThreads(userId: string) {
     })
       .populate({
         path: "threadCommunity",
-        select: "name id image", // Assuming 'id' is needed, though '_id' is automatically included
+        select: "name id image",
       })
       .populate({
         path: "children",

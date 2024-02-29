@@ -31,7 +31,7 @@ export default async function UserProfile() {
     );
 
     //const comments = await fetchAllComments("65deb60cce32e20b03bd304a");
-    //console.log(fetchedThreads);
+    console.log(currentLoggedInUserData.toObject().tagged);
 
     const profileHeaderProps = {
       accessedAccountUserId: currentLoggedInUserData.userId,
@@ -51,6 +51,7 @@ export default async function UserProfile() {
             accountId={currentLoggedInUserData.id}
             accountImage={currentLoggedInUserData.image}
             accountThreads={fetchedThreads}
+            accountTags={currentLoggedInUserData.tagged.toObject()}
             tabList={profileTabs}
             accountType="User"
             renderCardInteractions={false}

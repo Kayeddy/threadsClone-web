@@ -8,9 +8,27 @@ import {
   useSpring,
 } from "framer-motion";
 
+/**
+ * AnimatedTooltip is a React component that displays an animated tooltip
+ * for its child elements when hovered. The tooltip's appearance, including
+ * rotation and translation, is animated using Framer Motion based on the mouse
+ * position over the child element. The tooltip text is customizable via props.
+ *
+ * @component
+ * @param {Object} props - The properties passed to the component.
+ * @param {React.ReactNode} props.children - The child elements over which the tooltip is shown.
+ * @param {string} props.tooltipText - The text content to display inside the tooltip.
+ *
+ * @example
+ * <AnimatedTooltip tooltipText="Tooltip text goes here">
+ *   <button>Hover over me</button>
+ * </AnimatedTooltip>
+ *
+ * @returns {React.ReactElement} The AnimatedTooltip component with children and a conditional tooltip based on hover state.
+ */
 export const AnimatedTooltip = ({
   children,
-  tooltipText, // Keep the tooltipText prop for the tooltip text
+  tooltipText,
 }: {
   children: React.ReactNode;
   tooltipText: string;
@@ -37,6 +55,7 @@ export const AnimatedTooltip = ({
       className="-mr-4 relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onMouseOutCapture={() => setIsHovered(false)}
       onMouseMove={handleMouseMove}
     >
       {children}

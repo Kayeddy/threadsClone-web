@@ -5,10 +5,12 @@ import MembersTab from "../tabs/MembersTab";
 import PostCommunityThreadForm from "../forms/PostCommunityThreadForm";
 import CommunityInvitationsTab from "../tabs/CommunityInvitationsTab";
 import ProfileRepliesTab from "../tabs/ProfileRepliesTab";
+import ProfileTaggedTab from "../tabs/ProfileTaggedTab";
 
 interface Props {
   userId: string;
   accountThreads: [] | any;
+  accountTags: [] | any;
   accountId: string;
   accountImage: string;
   tabList: any[];
@@ -41,6 +43,7 @@ interface Props {
 export default function AccountProfileTabs({
   userId,
   accountThreads,
+  accountTags,
   accountId,
   accountImage,
   tabList,
@@ -112,7 +115,9 @@ export default function AccountProfileTabs({
             />
           )}
 
-          {tab.value === "tagged" && null}
+          {tab.value === "tagged" && (
+            <ProfileTaggedTab userTagsData={accountTags} />
+          )}
           {tab.value === "members" && (
             <MembersTab
               communityMembersList={accountMembers}

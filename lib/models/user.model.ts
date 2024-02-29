@@ -10,6 +10,20 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   image: { type: String },
   bio: { type: String },
+  tagged: [
+    {
+      thread: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Thread",
+        required: true,
+      },
+      taggedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    },
+  ],
   threads: [
     {
       type: mongoose.Schema.Types.ObjectId,
