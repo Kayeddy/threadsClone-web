@@ -69,6 +69,7 @@ function PostCommunityThreadForm({
         threadContent: values.thread,
         threadAuthor: userId,
         threadCommunity: organization?.id || null,
+        tags: null,
         path: pathname,
       });
 
