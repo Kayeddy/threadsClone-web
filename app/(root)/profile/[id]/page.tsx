@@ -54,9 +54,11 @@ export default async function UserProfile({
             accountId={accessedUserProfileData.id}
             accountImage={accessedUserProfileData.image}
             accountThreads={fetchedThreads}
+            accountTags={currentLoggedInUserData.tagged.toObject()}
             tabList={profileTabs}
             accountType="User"
             renderCardInteractions={false}
+            showUserProfileData={false}
           />
         </div>
       </section>

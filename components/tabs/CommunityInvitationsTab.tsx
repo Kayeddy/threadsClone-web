@@ -23,8 +23,29 @@ export default function CommunityInvitationsTab() {
     }
   }, []);
 
-  if (!organization || !organizationPendingInvites) {
-    return <div>Loading</div>;
+  useEffect(() => {
+    if (organization) {
+      (async () => {
+        const invites = await organization.getInvitations();
+        setOrganizationPendingInvites(invites.data);
+      })();
+    }
+  }, [organization]);
+
+  if (organization && organizationPendingInvites.length < 0) {
+    return <p className="no-result mt-9"> No pending invites </p>;
+  }
+  if (!organization) {
+    return (
+      <p className="no-result mt-9"> Please access your oganization profile </p>
+    );
+  }
+  if (!organizationPendingInvites) {
+    return (
+      <p className="no-result mt-9">
+        There are no pending invites at the moment
+      </p>
+    );
   } else {
     return (
       <section className="mt-9 flex flex-col gap-10">

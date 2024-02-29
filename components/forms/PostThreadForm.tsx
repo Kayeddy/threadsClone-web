@@ -72,7 +72,7 @@ function PostThreadForm({
       const createdThread = await createThread({
         threadContent: values.thread,
         threadAuthor: userId,
-        threadCommunity: threadCommunityId,
+        threadCommunity: null,
         path: pathname,
         likes: [],
         tags: selectedUsers.map((user) => user.userId),

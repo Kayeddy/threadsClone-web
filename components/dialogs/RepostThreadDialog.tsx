@@ -60,14 +60,14 @@ export default function RepostThreadDialog({
   return (
     <Dialog onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
-      <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white">
+      <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white flex flex-col items-center justify-center">
         <DialogHeader>
           <DialogTitle>
             {threadReposted ? "Thread reposted successfully!" : "Repost Thread"}
           </DialogTitle>
           <DialogDescription>
             {threadReposted ? (
-              <CheckIcon className="h-14 w-14 m-auto" />
+              <CheckIcon className="h-14 w-14 mx-auto" />
             ) : (
               "Are you sure you want to repost this Thread on your profile feed?"
             )}

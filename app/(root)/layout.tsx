@@ -24,8 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <SpeedInsights />
-
+      {/**
+       <SpeedInsights />
+       */}
       <html lang="en">
         <body className={inter.className}>
           <div className="gradient-line"></div>

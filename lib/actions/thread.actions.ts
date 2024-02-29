@@ -363,10 +363,7 @@ export async function deleteThread(
       { $pull: { threads: threadId } }
     );
 
-    // Invoke the revalidatePath function
-    if (typeof revalidatePath === "function") {
-      await revalidatePath(path);
-    }
+    revalidatePath(path);
   } catch (error) {
     console.error(`Error deleting thread: ${error}`);
     throw new Error(`Failed to delete thread. Error details: ${error}`);

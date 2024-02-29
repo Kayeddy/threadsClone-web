@@ -59,7 +59,7 @@ export default function DeleteThreadDialog({
   return (
     <Dialog onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>{triggerImage}</DialogTrigger>
-      <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white">
+      <DialogContent className="max-w-[90%] sm:max-w-md bg-dark-2 text-white flex flex-col items-center justify-center">
         <DialogHeader>
           <DialogTitle>
             {threadDeleted ? "Thread deleted successfully" : "Delete Thread"}

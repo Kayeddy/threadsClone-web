@@ -19,6 +19,7 @@ interface Props {
   isInCommunity?: boolean;
   isUserFromCommunity?: boolean;
   renderCardInteractions: boolean;
+  showUserProfileData?: boolean;
 }
 
 /**
@@ -51,38 +52,70 @@ export default function AccountProfileTabs({
   accountMembers = null,
   renderCardInteractions,
   isUserFromCommunity = false,
+  showUserProfileData = true,
 }: Props) {
   return (
     <Tabs defaultValue={tabList[0]?.value} className="w-full">
-      <TabsList className="tab-list">
-        {tabList.map((tab) => (
+      <TabsList className="tab-list cursor-default">
+        {showUserProfileData ? (
+          tabList
+            .filter((tab) => tab.value !== "invites" || isUserFromCommunity)
+            .map((tab) => (
+              <TabsTrigger
+                key={tab.label}
+                value={tab.value}
+                className="tab-trigger"
+              >
+                <Image
+                  src={tab.icon}
+                  alt={tab.label}
+                  width={24}
+                  height={24}
+                  className="object-contain"
+                />
+                <p className="max-sm:hidden">{tab.label}</p>
+
+                {tab.label === "Threads" && (
+                  <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
+                    {accountThreads.length ? accountThreads.length : 0}
+                  </p>
+                )}
+
+                {tab.label === "Members" && (
+                  <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
+                    {accountMembers ? accountMembers.length : 0}
+                  </p>
+                )}
+              </TabsTrigger>
+            ))
+        ) : (
           <TabsTrigger
-            key={tab.label}
-            value={tab.value}
-            className="tab-trigger"
+            key={tabList[0].label}
+            value={tabList[0].value}
+            className="tab-trigger cursor-default"
           >
             <Image
-              src={tab.icon}
-              alt={tab.label}
+              src={tabList[0].icon}
+              alt={tabList[0].label}
               width={24}
               height={24}
               className="object-contain"
             />
-            <p className="max-sm:hidden">{tab.label}</p>
+            <p className="max-sm:hidden">{tabList[0].label}</p>
 
-            {tab.label === "Threads" && (
+            {tabList[0].label === "Threads" && (
               <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
                 {accountThreads.length ? accountThreads.length : 0}
               </p>
             )}
 
-            {tab.label === "Members" && (
+            {tabList[0].label === "Members" && (
               <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
                 {accountMembers ? accountMembers.length : 0}
               </p>
             )}
           </TabsTrigger>
-        ))}
+        )}
       </TabsList>
 
       {tabList.map((tab) => (
@@ -108,23 +141,30 @@ export default function AccountProfileTabs({
               />
             </div>
           )}
-          {tab.value === "replies" && (
-            <ProfileRepliesTab
-              accountThreads={accountThreads}
-              currentLoggedInUserId={userId}
-            />
-          )}
 
-          {tab.value === "tagged" && (
-            <ProfileTaggedTab userTagsData={accountTags} />
+          {showUserProfileData && (
+            <>
+              {tab.value === "replies" && (
+                <ProfileRepliesTab
+                  accountThreads={accountThreads}
+                  currentLoggedInUserId={userId}
+                />
+              )}
+
+              {tab.value === "tagged" && (
+                <ProfileTaggedTab userTagsData={accountTags} />
+              )}
+              {tab.value === "members" && (
+                <MembersTab
+                  communityMembersList={accountMembers}
+                  currentUserId={userId}
+                />
+              )}
+              {tab.value === "invites" && isUserFromCommunity && (
+                <CommunityInvitationsTab />
+              )}
+            </>
           )}
-          {tab.value === "members" && (
-            <MembersTab
-              communityMembersList={accountMembers}
-              currentUserId={userId}
-            />
-          )}
-          {tab.value === "invites" && <CommunityInvitationsTab />}
         </TabsContent>
       ))}
     </Tabs>
