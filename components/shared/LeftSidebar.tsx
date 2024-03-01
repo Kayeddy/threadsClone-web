@@ -22,9 +22,7 @@ export default function LeftSidebar() {
       <div className="flex w-full flex-1 flex-col gap-6 px-6">
         {sidebarLinks.map((link) => {
           // Determine if the current link is active based on the pathname
-          const isActive =
-            pathname === link.route ||
-            (pathname.includes(link.route) && link.route.length > 1);
+          const isActive = pathname === link.route;
 
           return (
             <Link
