@@ -72,8 +72,6 @@ function PostCommunityThreadForm({
         tags: null,
         path: pathname,
       });
-
-      router.push("/"); // Navigate away after successful submission
     } finally {
       setIsSubmitting(false); // Re-enable submit button
     }
