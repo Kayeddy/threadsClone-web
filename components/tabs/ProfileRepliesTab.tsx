@@ -47,11 +47,11 @@ export default async function ProfileRepliesTab({
     .flat();
 
   return (
-    <div className="mt-9 flex flex-col gap-10">
+    <div className="mt-9">
       {structuredReplies.length === 0 ? (
         <p className="no-result">No replies yet.</p>
       ) : (
-        <div>
+        <div className="mt-9 flex flex-col gap-10">
           {structuredReplies.map((reply: any) => (
             <ReplyThreadCard key={reply.commentContent} replyData={reply} />
           ))}
